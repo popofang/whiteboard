@@ -1,4 +1,4 @@
-extends layout
+extends head
 
 block content
 	.container
@@ -56,10 +56,10 @@ block content
 							li
 								button.btn.btn-default(type="button" aria-label="椭圆")
 									span.glyphicon.glyphicon-picture(aria-hidden="true")
-					button.btn.btn-default(type="button" aria-label="颜色")
-						span.glyphicon.glyphicon-tint(aria-hidden="true")
-					button.btn.btn-default(type="button" aria-label="粗细")
-						span.glyphicon.glyphicon-pencil(aria-hidden="true")
+					button.btn.btn-default.jscolor(type="button" aria-label="颜色" data-toggle="dropdown" class="{valueElement:'colorValue', styleElement:'colorStyle'}")
+						span.glyphicon.glyphicon-tint.colors(aria-hidden="true")
+					button.btn.btn-default.stroke(type="button" aria-label="粗细")
+						span.glyphicon.glyphicon-barcode(aria-hidden="true")
 			.col-md-4.col-xs-4.others
 				.btn-group
 					button.btn.btn-default.btn-lg(type="button" aria-label="画笔")
@@ -67,4 +67,7 @@ block content
 					button.btn.btn-default.btn-lg(type="button" aria-label="画笔")
 						span.glyphicon.glyphicon-pencil(aria-hidden="true")
 		.row
+			.col-md-12
+				input#colorValue(type="hidden")
+				canvas
 			
