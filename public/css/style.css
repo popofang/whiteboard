@@ -1,0 +1,30 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+.row, .container {
+	margin: 0;
+	padding: 0;
+}
+
+.options {
+	background-color: #000;
+}
+
+.tools, .shapes, .operations {
+	min-width: 100%;
+	text-align: center;
+}
+
+.others>.btn-group {
+	float: right;
+}
+
+li button.btn.btn-default {
+	border: none;
+}
+
+button span {
+	width: 100%;
+}

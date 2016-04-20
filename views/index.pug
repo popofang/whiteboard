@@ -1,0 +1,70 @@
+extends layout
+
+block content
+	.container
+		.row
+			.col-md-8.col-xs-8.options
+				.btn-group(role="group")
+					.btn-group(role="group")
+						button.btn.btn-default.dropdown-toggle(type="button" aria-label="取消" data-toggle="dropdown")
+							span.glyphicon.glyphicon-arrow-left(aria-hidden="true")
+							span.caret
+						ul.dropdown-menu.operations
+							li
+								button.btn.btn-default(type="button" aria-label="取消")
+									span.glyphicon.glyphicon-arrow-left(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="重做")
+									span.glyphicon.glyphicon-arrow-right(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="刷新")
+									span.glyphicon.glyphicon-refresh(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="删除")
+									span.glyphicon.glyphicon-trash(aria-hidden="true")
+					.btn-group(role="group")
+						button.btn.btn-default.dropdown-toggle(type="button" aria-label="画笔" data-toggle="dropdown")
+							span.glyphicon.glyphicon-pencil(aria-hidden="true")
+							span.caret
+						ul.dropdown-menu.tools
+							li
+								button.btn.btn-default(type="button" aria-label="画笔")
+									span.glyphicon.glyphicon-pencil(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="橡皮")
+									span.glyphicon.glyphicon-erase(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="文字")
+									span.glyphicon.glyphicon-font(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="图片")
+									span.glyphicon.glyphicon-picture(aria-hidden="true")
+					.btn-group(role="group")
+						button.btn.btn-default.dropdown-toggle(type="button" aria-label="正方形" data-toggle="dropdown")
+							span.glyphicon.glyphicon-pencil(aria-hidden="true")
+							span.caret
+						ul.dropdown-menu.shapes
+							li
+								button.btn.btn-default(type="button" aria-label="正方形")
+									span.glyphicon.glyphicon-pencil(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="矩形")
+									span.glyphicon.glyphicon-erase(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="圆形")
+									span.glyphicon.glyphicon-font(aria-hidden="true")
+							li
+								button.btn.btn-default(type="button" aria-label="椭圆")
+									span.glyphicon.glyphicon-picture(aria-hidden="true")
+					button.btn.btn-default(type="button" aria-label="颜色")
+						span.glyphicon.glyphicon-tint(aria-hidden="true")
+					button.btn.btn-default(type="button" aria-label="粗细")
+						span.glyphicon.glyphicon-pencil(aria-hidden="true")
+			.col-md-4.col-xs-4.others
+				.btn-group
+					button.btn.btn-default.btn-lg(type="button" aria-label="画笔")
+						span.glyphicon.glyphicon-pencil(aria-hidden="true")
+					button.btn.btn-default.btn-lg(type="button" aria-label="画笔")
+						span.glyphicon.glyphicon-pencil(aria-hidden="true")
+		.row
+			
