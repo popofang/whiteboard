@@ -6,18 +6,7 @@
 .row, .container {
 	margin: 0;
 	padding: 0;
-}
-
-.options {
-}
-
-.tools, .shapes, .operations {
-	min-width: 100%;
-	text-align: center;
-}
-
-.others>.btn-group {
-	float: right;
+	width: 100%;
 }
 
 li button.btn.btn-default {
@@ -27,3 +16,21 @@ li button.btn.btn-default {
 button span {
 	width: 100%;
 }
+
+.tools, .shapes, .operations {
+	min-width: 100%;
+	text-align: center;
+}
+
+.slider {
+	margin: 10px 0;
+}
+
+.others>.btn-group {
+	float: right;
+}
+
+/*canvas {
+	width: 100%;
+	height: 100%;
+}*/
