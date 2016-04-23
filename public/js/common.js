@@ -27,10 +27,14 @@ $(function() {
 	/******** 画板 ********/
 	$("#board").attr('width', $('#container').width());
 	$("#board").attr('height', window.innerHeight - $('.row').height());
+
+	//初始参数
 	var nX, nY, nEndX, nEndY;
 	var bIsPaint = false; //绘制标识
 	var ctx = $("#board").get(0).getContext("2d");
 	var sType = "画笔"; //工具类型
+	var rectTip = $("<div style='position:absolute;border:1px #000 solid;display:none;'></div>");
+	$('#container').append(rectTip);
 	$('#container').mousemove(fDraw); //绑定鼠标绘制事件
 
 	//根据工具选择绘制函数
@@ -51,12 +55,10 @@ $(function() {
 			// case "图片": 
 			// 	fDrawFree(e);
 			// 	break;
-			// case "矩形": 
-			// 	fDrawFree(e);
-			// 	break;
-			// case "正方形": 
-			// 	fDrawFree(e);
-			// 	break;
+			case "矩形": {
+				fDrawRectTip(e);
+				break;
+			}
 			// case "椭圆": 
 			// 	fDrawFree(e);
 			// 	break;
@@ -72,6 +74,7 @@ $(function() {
         var offset = $("#board").offset();
         nX = e.pageX - offset.left;
 		nY = e.pageY - offset.top;
+		console.log(nX + "," + nY);
 		//判断工具类型执行相应函数
 		switch(sType) {
 		 	case "画笔":
@@ -81,18 +84,15 @@ $(function() {
    //        	case 4:	
    //        		lineTip.show(); 
    //        		break;
-   //        	case 5: {
-			//     var borderColor = "#"+ $("#colorpicker-popup").val();
-			//     var borderWidth  = $("#penWidth").val()+"px"; 
-			//     var sr = borderColor +" "+borderWidth+ " solid";
-			//     var backgroundColor ="#"+$("#colorpicker-popup2").val();
-			//     rectTip.css({
-			// 	   "border": sr,
-			// 	   "background-color":backgroundColor
-			//     });
-			// 	rectTip.show();
-			// 	break;    
-			// }
+          	case "矩形": {
+			    var borderWidth  = ctx.lineWidth + "px"; 
+			    var borderColor = ctx.strokeStyle;
+			    var border = borderWidth +" " + borderColor + " solid";
+			    rectTip.css({
+				   "border": border,
+			   	});
+				break;    
+			}
    //        	case 6:
    //        		break;
 		}
@@ -107,15 +107,16 @@ $(function() {
 		 		break;
           	case "橡皮":
           		break;
-          	// case "矩形":
-          	// 	fDrawRect();
-          	// 	break;
+          	case "矩形":
+          	 	fDrawRect();
+          	 	break;
           	// case 6:	
           	// 	fontTip.focus();
           	// 	break;
 		}
   	});
 
+  	//绘制任意线条
 	function fDrawFree(e) {
 		if(bIsPaint) {
 	    	var offset = $("#board").offset();
@@ -133,4 +134,24 @@ $(function() {
 		    ctx.moveTo(x, y);
 		}
 	}
+
+	//绘制矩形
+	function fDrawRectTip(e) {
+  	    var offset = $("#board").offset();
+        nEndX = e.pageX - offset.left;
+        nEndY = e.pageY - offset.top;
+        if(bIsPaint) {
+           rectTip.css({left: nX + offset.left - ctx.lineWidth/2, top: nY - ctx.lineWidth/2});
+           rectTip.width(nEndX - nX - ctx.lineWidth);
+           rectTip.height(nEndY - nY - ctx.lineWidth);
+           rectTip.show();
+        }
+  	}
+
+  	function fDrawRect(e) {
+  		console.log(nX + "," + nY);
+	    ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
+	 	$("#board").focus(); 
+	    rectTip.hide();
+  	}
 });
