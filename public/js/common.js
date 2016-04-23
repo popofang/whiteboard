@@ -8,10 +8,20 @@ $(function() {
 
 	$('#colorValue').change(function(event) {
 		$('.colors').css('color', '#' + this.value);
+		ctx.strokeStyle = '#' + this.value;
 	});
 
 	var slider = new Slider('.stroke', {
-		reversed : true
+		reversed : true,
+		tooltip: 'always',
+		min: 1,
+		max: 20,
+		value: 1,
+		orientation: 'vertical',
+	});
+
+	slider.on("slideStop", function() {
+		ctx.lineWidth = slider.getValue();
 	});
 
 	/******** 画板 ********/
