@@ -237,7 +237,7 @@ $(function() {
 
   	function fDrawWord(e) { //鼠标放开时绘制文字
 	    //ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
-	 	$("#board").focus(); 
+	 	//$("#board").focus(); 
 	    //wordTip.hide();
   	}
 });
