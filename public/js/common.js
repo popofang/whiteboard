@@ -239,5 +239,6 @@ $(function() {
 	    //ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
 	 	//$("#board").focus(); 
 	    //wordTip.hide();
+	    
   	}
 });
