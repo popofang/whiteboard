@@ -34,7 +34,9 @@ $(function() {
 	var ctx = $("#board").get(0).getContext("2d");
 	var sType = "画笔"; //工具类型
 	var shapeTip = $("<div style='position:absolute;border:1px #000 solid;display:none;'></div>");
+	var wordTip =$("<textarea style='position:absolute;display:none;'></textarea>"); 
 	$('#container').append(shapeTip);
+	$('#container').append(wordTip);
 	$('#container').mousemove(fDraw); //绑定鼠标绘制事件
 
 	//根据工具选择绘制函数
@@ -49,9 +51,9 @@ $(function() {
 				fDrawFree(e);
 				break;
 			}
-			// case "文字": 
-			// 	fDrawFree(e);
-			// 	break;
+			case "文字": 
+				fDrawWordTip(e);
+				break;
 			// case "图片": 
 			// 	fDrawFree(e);
 			// 	break;
@@ -82,9 +84,10 @@ $(function() {
 		 		break;
           	case "橡皮":
           		break;
-   //        	case 4:	
-   //        		lineTip.show(); 
-   //        		break;
+         	case "文字":
+          		break;
+          	case "图片":
+          		break;
           	case "矩形": {
 			    var border = ctx.lineWidth + "px " + ctx.strokeStyle + " solid";
 			    shapeTip.css({
@@ -99,8 +102,6 @@ $(function() {
 			   	});
 				break;    
 			}
-   //        	case 6:
-   //        		break;
 		}
   	});
 			      
@@ -113,13 +114,18 @@ $(function() {
 		 		break;
           	case "橡皮":
           		break;
+          	case "文字":	{
+          		fDrawWord();
+          	 	break;
+          	}
           	case "矩形": {
           		fDrawRect();
           	 	break;
           	}
-          	case "直线":	
-          	 	fDrawLine();
+          	case "直线":	{
+          		fDrawLine();
           	 	break;
+          	}
 		}
   	});
 
@@ -160,7 +166,6 @@ $(function() {
   	}
 
   	function fDrawRect(e) { //鼠标放开时绘制矩形
-  		console.log(nX + "," + nY);
 	    ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
 	 	$("#board").focus(); 
 	    shapeTip.hide();
@@ -210,5 +215,29 @@ $(function() {
 	    ctx.stroke();  
 	 	$("#board").focus(); 
 	    shapeTip.hide();
+  	}
+
+  	//绘制文字
+	function fDrawWordTip(e) { //根据鼠标绘制文字输入框
+  	    var offset = $("#board").offset();
+        nEndX = e.pageX - offset.left;
+        nEndY = e.pageY - offset.top;
+        if(bIsPaint) {
+        	var nLeftX = nX < nEndX ? nX : nEndX;
+        	var nTopY = nY < nEndY ? nY : nEndY;
+        	wordTip.css({
+        		left: nLeftX + offset.left - ctx.lineWidth / 2, 
+        		top: nTopY - ctx.lineWidth / 2
+        	});
+           	wordTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
+           	wordTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
+           	wordTip.show();
+        }
+  	}
+
+  	function fDrawWord(e) { //鼠标放开时绘制文字
+	    //ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
+	 	$("#board").focus(); 
+	    //wordTip.hide();
   	}
 });
