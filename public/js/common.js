@@ -62,9 +62,10 @@ $(function() {
 			// case "椭圆": 
 			// 	fDrawFree(e);
 			// 	break;
-			// case "圆形": 
-			// 	fDrawFree(e);
-			// 	break;
+			case "矩形": {
+				fDrawLineTip(e);
+				break;
+			}
 		}
 	}
 
@@ -85,9 +86,7 @@ $(function() {
    //        		lineTip.show(); 
    //        		break;
           	case "矩形": {
-			    var borderWidth  = ctx.lineWidth + "px"; 
-			    var borderColor = ctx.strokeStyle;
-			    var border = borderWidth +" " + borderColor + " solid";
+			    var border = ctx.lineWidth + "px " + ctx.strokeStyle + " solid";
 			    rectTip.css({
 				   "border": border,
 			   	});
@@ -110,9 +109,9 @@ $(function() {
           	case "矩形":
           	 	fDrawRect();
           	 	break;
-          	// case 6:	
-          	// 	fontTip.focus();
-          	// 	break;
+          	case "直线":	
+          	 	fDrawLine();
+          	 	break;
 		}
   	});
 
@@ -136,7 +135,7 @@ $(function() {
 	}
 
 	//绘制矩形
-	function fDrawRectTip(e) {
+	function fDrawRectTip(e) { //根据鼠标绘制矩形示意框
   	    var offset = $("#board").offset();
         nEndX = e.pageX - offset.left;
         nEndY = e.pageY - offset.top;
@@ -148,7 +147,32 @@ $(function() {
         }
   	}
 
-  	function fDrawRect(e) {
+  	function fDrawRect(e) { //鼠标放开时绘制矩形
+  		console.log(nX + "," + nY);
+	    ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
+	 	$("#board").focus(); 
+	    rectTip.hide();
+  	}
+
+  	//绘制直线
+	function fDrawRectTip(e) { //根据鼠标绘制直线示意线段
+  	    var offset = $("#board").offset();
+        nEndX = e.pageX - offset.left;
+        nEndY = e.pageY - offset.top;
+        if(bIsPaint) {
+        	var nLeftX = nX < nEndX ? nX : nEndX;
+        	var nTopY = nY < nEndY ? nY : nEndY;
+        	rectTip.css({
+        		left: nLeftX + offset.left - ctx.lineWidth/2, 
+        		top: nTopY - ctx.lineWidth/2
+        	});
+			rectTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
+			rectTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
+			rectTip.show();
+        }
+  	}
+
+  	function fDrawRect(e) { //鼠标放开时绘制直线
   		console.log(nX + "," + nY);
 	    ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
 	 	$("#board").focus(); 
