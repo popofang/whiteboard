@@ -93,7 +93,7 @@ $(function() {
 				break;    
 			}
 			case "直线": {
-			    var border = ctx.lineWidth/2 + "px " + ctx.strokeStyle + " solid";
+			    var border = ctx.lineWidth / 2 + "px " + ctx.strokeStyle + " solid";
 			    shapeTip.css({
 				   "border": border,
 			   	});
@@ -174,6 +174,8 @@ $(function() {
         if(bIsPaint) {
         	var nLeftX = nX < nEndX ? nX : nEndX;
         	var nTopY = nY < nEndY ? nY : nEndY;
+        	var sOriginX = nX < nEndX ? '0' : '100%';
+        	var sOriginY = nY < nEndY ? '0' : '100%';
         	shapeTip.css({
         		left: nLeftX + offset.left - ctx.lineWidth / 2, 
         		top: nTopY - ctx.lineWidth / 2
@@ -181,9 +183,10 @@ $(function() {
 			shapeTip.width(0);
 			var nLength = Math.sqrt(Math.pow(nEndX - nX, 2) + Math.pow(nEndY - nY, 2));
 			shapeTip.height(nLength - ctx.lineWidth);
-			var sTransformOrigin = '0 0';
-			var nDegree = Math.atan((nEndY - nY) / (nEndX - nX));
-			console.log(nDegree);
+			var sTransformOrigin = sOriginX + ' ' + sOriginY;
+			console.log(sTransformOrigin);
+			var nDegree = - Math.atan((nEndX - nX) / (nEndY - nY)) / Math.PI * 180;
+			console.log(Math.atan((nEndX - nX) / (nEndY - nY)) / Math.PI * 180);
 			var sRotate = 'rotate(' + nDegree +'deg)';
 			shapeTip.css({
 				'transform': sRotate,
