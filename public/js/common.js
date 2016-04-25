@@ -33,8 +33,8 @@ $(function() {
 	var bIsPaint = false; //绘制标识
 	var ctx = $("#board").get(0).getContext("2d");
 	var sType = "画笔"; //工具类型
-	var rectTip = $("<div style='position:absolute;border:1px #000 solid;display:none;'></div>");
-	$('#container').append(rectTip);
+	var shapeTip = $("<div style='position:absolute;border:1px #000 solid;display:none;'></div>");
+	$('#container').append(shapeTip);
 	$('#container').mousemove(fDraw); //绑定鼠标绘制事件
 
 	//根据工具选择绘制函数
@@ -62,7 +62,7 @@ $(function() {
 			// case "椭圆": 
 			// 	fDrawFree(e);
 			// 	break;
-			case "矩形": {
+			case "直线": {
 				fDrawLineTip(e);
 				break;
 			}
@@ -87,7 +87,14 @@ $(function() {
    //        		break;
           	case "矩形": {
 			    var border = ctx.lineWidth + "px " + ctx.strokeStyle + " solid";
-			    rectTip.css({
+			    shapeTip.css({
+				   "border": border,
+			   	});
+				break;    
+			}
+			case "直线": {
+			    var border = ctx.lineWidth/2 + "px " + ctx.strokeStyle + " solid";
+			    shapeTip.css({
 				   "border": border,
 			   	});
 				break;    
@@ -106,9 +113,10 @@ $(function() {
 		 		break;
           	case "橡皮":
           		break;
-          	case "矩形":
-          	 	fDrawRect();
+          	case "矩形": {
+          		fDrawRect();
           	 	break;
+          	}
           	case "直线":	
           	 	fDrawLine();
           	 	break;
@@ -123,8 +131,7 @@ $(function() {
 	    	var y = e.pageY - offset.top;
 			ctx.lineTo(x, y);
 			ctx.stroke();  
-        }
-		else {
+        } else {
 			//???????
 			ctx.beginPath();
 		    var offset = $("#board").offset();
@@ -140,10 +147,15 @@ $(function() {
         nEndX = e.pageX - offset.left;
         nEndY = e.pageY - offset.top;
         if(bIsPaint) {
-           rectTip.css({left: nX + offset.left - ctx.lineWidth/2, top: nY - ctx.lineWidth/2});
-           rectTip.width(nEndX - nX - ctx.lineWidth);
-           rectTip.height(nEndY - nY - ctx.lineWidth);
-           rectTip.show();
+        	var nLeftX = nX < nEndX ? nX : nEndX;
+        	var nTopY = nY < nEndY ? nY : nEndY;
+        	shapeTip.css({
+        		left: nLeftX + offset.left - ctx.lineWidth / 2, 
+        		top: nTopY - ctx.lineWidth / 2
+        	});
+           	shapeTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
+           	shapeTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
+           	shapeTip.show();
         }
   	}
 
@@ -151,31 +163,49 @@ $(function() {
   		console.log(nX + "," + nY);
 	    ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
 	 	$("#board").focus(); 
-	    rectTip.hide();
+	    shapeTip.hide();
   	}
 
   	//绘制直线
-	function fDrawRectTip(e) { //根据鼠标绘制直线示意线段
+	function fDrawLineTip(e) { //根据鼠标绘制直线示意线段
   	    var offset = $("#board").offset();
         nEndX = e.pageX - offset.left;
         nEndY = e.pageY - offset.top;
         if(bIsPaint) {
         	var nLeftX = nX < nEndX ? nX : nEndX;
         	var nTopY = nY < nEndY ? nY : nEndY;
-        	rectTip.css({
-        		left: nLeftX + offset.left - ctx.lineWidth/2, 
-        		top: nTopY - ctx.lineWidth/2
+        	shapeTip.css({
+        		left: nLeftX + offset.left - ctx.lineWidth / 2, 
+        		top: nTopY - ctx.lineWidth / 2
         	});
-			rectTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
-			rectTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
-			rectTip.show();
+			shapeTip.width(0);
+			var nLength = Math.sqrt(Math.pow(nEndX - nX, 2) + Math.pow(nEndY - nY, 2));
+			shapeTip.height(nLength - ctx.lineWidth);
+			var sTransformOrigin = '0 0';
+			var nDegree = Math.atan((nEndY - nY) / (nEndX - nX));
+			console.log(nDegree);
+			var sRotate = 'rotate(' + nDegree +'deg)';
+			shapeTip.css({
+				'transform': sRotate,
+				'transform-origin': sTransformOrigin,
+				'-ms-transform': sRotate, /* IE 9 */
+				'-ms-transform-origin': sTransformOrigin, /* IE 9 */
+				'-webkit-transform': sRotate, /* Safari and Chrome */
+				'-webkit-transform-origin': sTransformOrigin, /* Safari and Chrome */
+				'-moz-transform': sRotate, /* Firefox */
+				'-moz-transform-origin': sTransformOrigin, /* Firefox */
+				'-o-transform': sRotate, /* Opera */
+				'-o-transform-origin': sTransformOrigin /* Opera */
+			});
+			shapeTip.show();
         }
   	}
 
-  	function fDrawRect(e) { //鼠标放开时绘制直线
-  		console.log(nX + "," + nY);
-	    ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
+  	function fDrawLine(e) { //鼠标放开时绘制直线
+  		ctx.moveTo(nX, nY);
+	    ctx.lineTo(nEndX, nEndY);
+	    ctx.stroke();  
 	 	$("#board").focus(); 
-	    rectTip.hide();
+	    shapeTip.hide();
   	}
 });
