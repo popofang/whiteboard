@@ -3,6 +3,17 @@ $(function() {
 	$('.options').find('li').children('button').click(function(event) {
 		var selected = $(this).children('span').attr('class');
 		sType = $(this).attr("aria-label");
+		if(sType == "文字") {
+			slider.options.min = 10;
+			slider.options.max = 40;
+			slider.setValue(10);
+			ctx.lineWidth = slider.getValue();
+		} else {
+			slider.options.min = 1;
+			slider.options.max = 20;
+			slider.setValue(1);
+			ctx.lineWidth = slider.getValue();
+		}
 		$(this).parents('ul').siblings('button').children('span').eq(0).attr('class', selected);
 	});
 
@@ -18,6 +29,9 @@ $(function() {
 		max: 20,
 		value: 1,
 		orientation: 'vertical',
+		formatter: function() {
+			return arguments[0] + 'px';
+		}
 	});
 
 	slider.on("slideStop", function() {
@@ -33,59 +47,30 @@ $(function() {
 	var bIsPaint = false; //绘制标识
 	var ctx = $("#board").get(0).getContext("2d");
 	var sType = "画笔"; //工具类型
-	var shapeTip = $("<div style='position:absolute;border:1px #000 solid;display:none;'></div>");
-	var wordTip =$("<textarea style='position:absolute;display:none;'></textarea>"); 
+	var shapeTip = $("<div class='tip'></div>");
+	var wordTip =$("<textarea class='tip'></textarea>"); 
 	$('#container').append(shapeTip);
 	$('#container').append(wordTip);
-	$('#container').mousemove(fDraw); //绑定鼠标绘制事件
 
-	//根据工具选择绘制函数
-	function fDraw(e) {
-		switch(sType) {
-			case "画笔": {
-				fDrawFree(e);
-				break;
-			}
-			case "橡皮": {
-				ctx.strokeStyle = "#fff";
-				fDrawFree(e);
-				break;
-			}
-			case "文字": 
-				fDrawWordTip(e);
-				break;
-			// case "图片": 
-			// 	fDrawFree(e);
-			// 	break;
-			case "矩形": {
-				fDrawRectTip(e);
-				break;
-			}
-			// case "椭圆": 
-			// 	fDrawFree(e);
-			// 	break;
-			case "直线": {
-				fDrawLineTip(e);
-				break;
-			}
-		}
-	}
+	//绑定鼠标绘制事件
+	$('#container').mousemove(fDraw); 
 
-	$("#container").mousedown(function(e){  
+	$("#container").mousedown(function(e){ //鼠标按下 
         bIsPaint = true; //设置绘画标识
         //设置画笔起始点
         var offset = $("#board").offset();
         nX = e.pageX - offset.left;
 		nY = e.pageY - offset.top;
-		console.log(nX + "," + nY);
 		//判断工具类型执行相应函数
 		switch(sType) {
 		 	case "画笔":
 		 		break;
           	case "橡皮":
           		break;
-         	case "文字":
+         	case "文字": {
+         		fDrawWordTip(e);
           		break;
+         	}
           	case "图片":
           		break;
           	case "矩形": {
@@ -104,10 +89,43 @@ $(function() {
 			}
 		}
   	});
-			      
-  	$("#container").mouseup(function(e){
+
+	//根据工具选择绘制函数
+	function fDraw(e) { //鼠标移动
+		switch(sType) {
+			case "画笔": {
+				fDrawFree(e);
+				break;
+			}
+			case "橡皮": {
+				ctx.strokeStyle = "#fff";
+				fDrawFree(e);
+				break;
+			}
+			case "文字": {
+				//fDrawWordTip(e);
+				break;
+			} 
+			// case "图片": 
+			// 	fDrawFree(e);
+			// 	break;
+			case "矩形": {
+				fDrawRectTip(e);
+				break;
+			}
+			// case "椭圆": 
+			// 	fDrawFree(e);
+			// 	break;
+			case "直线": {
+				fDrawLineTip(e);
+				break;
+			}
+		}
+	}
+
+  	$("#container").mouseup(function(e){ //鼠标放开
         bIsPaint = false;
-        // records operations history for undo or redo
+        //记录历史画笔
         //historyPush();	
 		switch(sType) {
 		 	case "画笔":
@@ -177,22 +195,26 @@ $(function() {
         nEndX = e.pageX - offset.left;
         nEndY = e.pageY - offset.top;
         if(bIsPaint) {
+        	//设置左上角
         	var nLeftX = nX < nEndX ? nX : nEndX;
         	var nTopY = nY < nEndY ? nY : nEndY;
-        	var sOriginX = nX < nEndX ? '0' : '100%';
-        	var sOriginY = nY < nEndY ? '0' : '100%';
         	shapeTip.css({
         		left: nLeftX + offset.left - ctx.lineWidth / 2, 
         		top: nTopY - ctx.lineWidth / 2
         	});
+
 			shapeTip.width(0);
 			var nLength = Math.sqrt(Math.pow(nEndX - nX, 2) + Math.pow(nEndY - nY, 2));
 			shapeTip.height(nLength - ctx.lineWidth);
+
+			//设置旋转原点
+        	var sOriginX = nX < nEndX ? '0' : '100%';
+        	var sOriginY = nY < nEndY ? '0' : '100%';
 			var sTransformOrigin = sOriginX + ' ' + sOriginY;
-			console.log(sTransformOrigin);
+
+			//设置旋转角度
 			var nDegree = - Math.atan((nEndX - nX) / (nEndY - nY)) / Math.PI * 180;
-			console.log(Math.atan((nEndX - nX) / (nEndY - nY)) / Math.PI * 180);
-			var sRotate = 'rotate(' + nDegree +'deg)';
+			var sRotate = 'rotate(' + nDegree + 'deg)';
 			shapeTip.css({
 				'transform': sRotate,
 				'transform-origin': sTransformOrigin,
@@ -220,25 +242,38 @@ $(function() {
   	//绘制文字
 	function fDrawWordTip(e) { //根据鼠标绘制文字输入框
   	    var offset = $("#board").offset();
-        nEndX = e.pageX - offset.left;
-        nEndY = e.pageY - offset.top;
         if(bIsPaint) {
-        	var nLeftX = nX < nEndX ? nX : nEndX;
-        	var nTopY = nY < nEndY ? nY : nEndY;
+        	//设定输入框位置
         	wordTip.css({
-        		left: nLeftX + offset.left - ctx.lineWidth / 2, 
-        		top: nTopY - ctx.lineWidth / 2
+        		left: nX + offset.left - ctx.lineWidth / 2, 
+        		top: nY - ctx.lineWidth / 2
         	});
-           	wordTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
-           	wordTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
+
+        	//设定输入框的样式和其中的文字样式
+           	wordTip.width($('#board').width());
+           	wordTip.height(ctx.lineWidth + 10);
+           	wordTip.css({
+           		'font-size': ctx.lineWidth + 'px',
+           		color: ctx.strokeStyle
+           	});
+           	wordTip.attr({
+           		placeholder: '在此输入',
+           	});
+
            	wordTip.show();
         }
   	}
 
+  	wordTip.blur(fDrawWord);
+
   	function fDrawWord(e) { //鼠标放开时绘制文字
-	    //ctx.strokeRect(nX, nY, nEndX - nX, nEndY - nY);
-	 	//$("#board").focus(); 
-	    //wordTip.hide();
-	    
+	    var word = wordTip.val();
+		if(wordTip.css("display")!= "none" && word) {
+		    var offset = $("#board").offset();
+		    var offset2 = wordTip.offset();
+		    ctx.fillText(word, offset2.left - offset.left, offset2.top - offset.top);
+    	  	wordTip.val(""); 
+		}
+		wordTip.hide();
   	}
 });

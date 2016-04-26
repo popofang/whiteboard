@@ -9,28 +9,27 @@
 	width: 100%;
 }
 
-li button.btn.btn-default {
-	border: none;
-}
+li button.btn.btn-default { border: none; }
 
-button span {
-	width: 100%;
-}
+button span { width: 100%; }
 
 .tools, .shapes, .operations {
 	min-width: 100%;
 	text-align: center;
 }
 
-.slider {
-	margin: 10px 0;
-}
+.slider { margin: 10px 0; }
 
-.others>.btn-group {
-	float: right;
-}
+.others>.btn-group { float: right; }
 
-/*canvas {
-	width: 100%;
-	height: 100%;
-}*/
+.tip {
+	 position:absolute;
+	 display:none;
+} 
+
+div.tip { border:1px #000 solid; }
+
+textarea.tip { 
+	border: none;
+	outline: none; 
+}
