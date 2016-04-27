@@ -78,10 +78,15 @@ $(function() {
 			    var border = ctx.lineWidth + "px " + ctx.strokeStyle + " solid";
 			    shapeTip.css({
 				   "border": border,
+				   "border-radius": 0
 			   	});
 				break;    
 			}
 			case "椭圆": {
+				var border = ctx.lineWidth + "px " + ctx.strokeStyle + " solid";
+			    shapeTip.css({
+				   "border": border,
+			   	});
 				break;    
 			}
 			case "直线": {
