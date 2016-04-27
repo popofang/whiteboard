@@ -69,7 +69,11 @@ $(function() {
           	case "橡皮":
           		break;
          	case "文字": {
-         		fDrawWordTip(e);
+         		var sTipFontSize = ctx.font.split(' ')[0];
+         		wordTip.css({
+         			color: ctx.strokeStyle,
+         			'font-size': sTipFontSize
+         		});
           		break;
          	}
           	case "图片":
@@ -112,12 +116,9 @@ $(function() {
 				break;
 			}
 			case "文字": {
-				//fDrawWordTip(e);
+				fDrawWordTip(e);
 				break;
 			} 
-			// case "图片": 
-			// 	fDrawFree(e);
-			// 	break;
 			case "矩形": {
 				fDrawRectTip(e);
 				break;
@@ -143,7 +144,7 @@ $(function() {
           	case "橡皮":
           		break;
           	case "文字":	{
-          		fDrawWord();
+          		//fDrawWord();
           	 	break;
           	}
           	case "矩形": {
@@ -178,6 +179,42 @@ $(function() {
 		    ctx.moveTo(x, y);
 		}
 	}
+
+	//绘制文字
+	function fDrawWordTip(e) { //根据鼠标绘制文字输入框
+        var offset = $("#board").offset();
+        nEndX = e.pageX - offset.left;
+        nEndY = e.pageY - offset.top;
+        if(bIsPaint) {
+         	var nLeftX = nX < nEndX ? nX : nEndX;
+         	var nTopY = nY < nEndY ? nY : nEndY;
+        	wordTip.css({
+         		left: nLeftX + offset.left - ctx.lineWidth / 2, 
+         		top: nTopY - ctx.lineWidth / 2
+         	});
+        	wordTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
+        	wordTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
+           	wordTip.attr({
+           		placeholder: '在此输入',
+           	});
+        	wordTip.show();
+        }
+  	}
+
+  	wordTip.blur(fDrawWord);
+
+  	function fDrawWord() { //鼠标放开时绘制文字
+	    var word = wordTip.val();
+		if(wordTip.css("display")!= "none" && word) {
+		    var offset = $("#board").offset();
+		    var offset2 = wordTip.offset();
+		    var nFontSize = ctx.font.split('px')[0] - 0;
+		    ctx.fillStyle = ctx.strokeStyle;
+		    ctx.fillText(word, offset2.left - offset.left, offset2.top - offset.top + nFontSize);
+    	  	wordTip.val(""); 
+		}
+		wordTip.hide();
+  	}
 
 	//绘制矩形
 	function fDrawRectTip(e) { //根据鼠标绘制矩形示意框
@@ -295,41 +332,4 @@ $(function() {
 	    shapeTip.hide();
   	}
 
-  	//绘制文字
-	function fDrawWordTip(e) { //根据鼠标绘制文字输入框
-  	    var offset = $("#board").offset();
-        if(bIsPaint) {
-        	//设定输入框位置
-        	wordTip.css({
-        		left: nX + offset.left - ctx.lineWidth / 2, 
-        		top: nY - ctx.lineWidth / 2
-        	});
-
-        	//设定输入框的样式和其中的文字样式
-           	wordTip.width($('#board').width());
-           	wordTip.height(ctx.lineWidth + 10);
-           	wordTip.css({
-           		'font-size': ctx.lineWidth + 'px',
-           		color: ctx.strokeStyle
-           	});
-           	wordTip.attr({
-           		placeholder: '在此输入',
-           	});
-
-           	wordTip.show();
-        }
-  	}
-
-  	wordTip.blur(fDrawWord);
-
-  	function fDrawWord() { //鼠标放开时绘制文字
-	    var word = wordTip.val();
-		if(wordTip.css("display")!= "none" && word) {
-		    var offset = $("#board").offset();
-		    var offset2 = wordTip.offset();
-		    ctx.fillText(word, offset2.left - offset.left, offset2.top - offset.top);
-    	  	wordTip.val(""); 
-		}
-		wordTip.hide();
-  	}
 });

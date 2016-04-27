@@ -30,7 +30,5 @@ button span { width: 100%; }
 div.tip { border:1px #000 solid; }
 
 textarea.tip { 
-	border: none;
-	outline: none; 
 	background: transparent;
 }
