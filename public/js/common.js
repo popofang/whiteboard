@@ -1,6 +1,8 @@
 $(function() {
-	/******** 工具 ********/
-	$('.options').find('li').children('button').click(function(event) {
+	/******** 工具栏 ********/
+
+	//画笔工具
+	$('.draw-options').find('li').children('button').click(function(event) {
 		var selected = $(this).children('span').attr('class');
 		sType = $(this).attr("aria-label");
 		if(sType == "文字") {
@@ -29,7 +31,7 @@ $(function() {
 		max: 20,
 		value: 1,
 		orientation: 'vertical',
-		formatter: function() {
+		formatter: function() { //tooltip格式
 			return arguments[0] + 'px';
 		}
 	});
@@ -39,6 +41,27 @@ $(function() {
 		ctx.font = slider.getValue() + "px Arial";
 	});
 
+	//操作工具
+	$('.operations').find('button').click(function(event) {
+		switch($(this).attr('aria-label')) {
+			case "撤销": {
+				fUndraw();
+				break;
+			}
+			case "重做": {
+				fRedraw();
+				break;
+			}
+			case "刷新": {
+				break;
+			}
+			case "重置": {
+				fClearBoard();
+				break;
+			}
+		}
+	});
+
 	/******** 画板 ********/
 	$("#board").attr('width', $('#container').width());
 	$("#board").attr('height', window.innerHeight - $('.row').height());
@@ -46,10 +69,16 @@ $(function() {
 	//初始参数
 	var nX, nY, nEndX, nEndY;
 	var bIsPaint = false; //绘制标识
-	var ctx = $("#board").get(0).getContext("2d");
+	var ctx = $("#board").get(0).getContext("2d"); //画布对象
 	var sType = "画笔"; //工具类型
+
+	//历史记录
+	var aHistory = new Array();
+	var nStep = -1;
+
+	//鼠标拖动需要用的示意框
 	var shapeTip = $("<div class='tip'></div>");
-	var wordTip =$("<textarea class='tip'></textarea>"); 
+	var wordTip = $("<textarea class='tip'></textarea>"); 
 	$('#container').append(shapeTip);
 	$('#container').append(wordTip);
 
@@ -136,17 +165,14 @@ $(function() {
 
   	$("#container").mouseup(function(e){ //鼠标放开
         bIsPaint = false;
-        //记录历史画笔
-        //historyPush();	
+        fHistoryAdd(); //增加历史记录	
 		switch(sType) {
 		 	case "画笔":
 		 		break;
           	case "橡皮":
           		break;
-          	case "文字":	{
-          		//fDrawWord();
+          	case "文字":
           	 	break;
-          	}
           	case "矩形": {
           		fDrawRect();
           	 	break;
@@ -332,4 +358,42 @@ $(function() {
 	    shapeTip.hide();
   	}
 
+
+  	//操作函数
+  	function fHistoryAdd() { //增加历史记录
+	    nStep++;
+		if(nStep < history.length) { 
+			history.length = nStep; 
+	  	}
+	  	aHistory.push($("#board").get(0).toDataURL());
+  	}
+
+  	function fUndraw() { //撤销
+		if (nStep >= 0) {
+	  		fClearBoard();
+	  		nStep--;
+	  		var oTemp = new Image();
+	  		oTemp.src = aHistory[nStep];
+	  		oTemp.onload = function() { 
+	  			ctx.drawImage(oTemp, 0, 0);
+	  		};
+  		}
+	}
+		    	  
+	function fRedraw() { //重做
+		if (nStep < history.length - 1) {
+			fClearBoard();
+			nStep++;
+			var oTemp = new Image();
+	  		oTemp.src = aHistory[nStep];
+	  		oTemp.onload = function() { 
+	  			ctx.drawImage(oTemp, 0, 0);
+	  		};
+		}
+	}
+
+  	function fClearBoard() { //清空画板
+  		ctx.fillStyle = "#fff";
+	  	ctx.clearRect(0, 0, $("#board").width(), $("#board").height());
+	}
 });
