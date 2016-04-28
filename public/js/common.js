@@ -52,9 +52,6 @@ $(function() {
 				fRedraw();
 				break;
 			}
-			case "刷新": {
-				break;
-			}
 			case "重置": {
 				fClearBoard();
 				break;
@@ -359,7 +356,7 @@ $(function() {
   	}
 
 
-  	//操作函数
+  	//操作工具函数
   	function fHistoryAdd() { //增加历史记录
 	    nStep++;
 		if(nStep < history.length) { 
@@ -395,5 +392,24 @@ $(function() {
   	function fClearBoard() { //清空画板
   		ctx.fillStyle = "#fff";
 	  	ctx.clearRect(0, 0, $("#board").width(), $("#board").height());
+	}
+
+	//用户工具
+	$('.others').find('button').click(function(event) {
+		switch($(this).attr('aria-label')) {
+			case "": {
+				fUndraw();
+				break;
+			}
+			case "下载": {
+				fDownloadImg();
+				break;
+			}
+		}
+	});
+
+	function fDownloadImg() { //下载
+		var sDataURL = $("#board").get(0).toDataURL('image/png').replace("image/png", "image/octet-stream");
+	    document.location.href = sDataURL;
 	}
 });
