@@ -3,7 +3,6 @@ $(function() {
 
 	//画笔工具
 	$('.draw-options').find('li').children('button').click(function(event) {
-		var selected = $(this).children('span').attr('class');
 		sType = $(this).attr("aria-label");
 		if(sType == "文字") {
 			slider.options.min = 10;
@@ -16,7 +15,16 @@ $(function() {
 			slider.setValue(1);
 			ctx.lineWidth = slider.getValue();
 		}
-		$(this).parents('ul').siblings('button').children('span').eq(0).attr('class', selected);
+		var oUl = $(this).parents('ul');
+		if(oUl.attr('class') == 'dropdown-menu tools') {
+			var selected = $(this).children('span').attr('class');
+			oUl.siblings('button').children('span').eq(0).attr('class', selected);
+		}
+		if(oUl.attr('class') == 'dropdown-menu shapes') {
+			var selected = $(this).children('span').html();
+			oUl.siblings('button').children('span').eq(0).html(selected);
+			//oUl.siblings('button').children('span').eq(0).attr('class', selected);
+		}
 	});
 
 	$('#colorValue').change(function(event) {
@@ -90,10 +98,14 @@ $(function() {
 		nY = e.pageY - offset.top;
 		//判断工具类型执行相应函数
 		switch(sType) {
-		 	case "画笔":
+		 	case "画笔": {
+		 		ctx.strokeStyle = $('.colors').css('color');
 		 		break;
-          	case "橡皮":
+		 	}
+          	case "橡皮": {
+          		ctx.strokeStyle = "#fff";
           		break;
+          	}
          	case "文字": {
          		var sTipFontSize = ctx.font.split(' ')[0];
          		wordTip.css({
@@ -137,7 +149,6 @@ $(function() {
 				break;
 			}
 			case "橡皮": {
-				ctx.strokeStyle = "#fff";
 				fDrawFree(e);
 				break;
 			}
