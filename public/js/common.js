@@ -23,7 +23,6 @@ $(function() {
 		if(oUl.attr('class') == 'dropdown-menu shapes') {
 			var selected = $(this).children('span').html();
 			oUl.siblings('button').children('span').eq(0).html(selected);
-			//oUl.siblings('button').children('span').eq(0).attr('class', selected);
 		}
 	});
 
@@ -370,8 +369,8 @@ $(function() {
   	//操作工具函数
   	function fHistoryAdd() { //增加历史记录
 	    nStep++;
-		if(nStep < history.length) { 
-			history.length = nStep; 
+		if(nStep < aHistory.length) { 
+			aHistory.length = nStep; 
 	  	}
 	  	aHistory.push($("#board").get(0).toDataURL());
   	}
@@ -389,7 +388,7 @@ $(function() {
 	}
 		    	  
 	function fRedraw() { //重做
-		if (nStep < history.length - 1) {
+		if (nStep < aHistory.length - 1) {
 			fClearBoard();
 			nStep++;
 			var oTemp = new Image();
@@ -409,7 +408,7 @@ $(function() {
 	$('.others').find('button').click(function(event) {
 		switch($(this).attr('aria-label')) {
 			case "": {
-				fUndraw();
+				//fUndraw();
 				break;
 			}
 			case "下载": {
@@ -423,4 +422,5 @@ $(function() {
 		var sDataURL = $("#board").get(0).toDataURL('image/png').replace("image/png", "image/octet-stream");
 	    document.location.href = sDataURL;
 	}
+
 });
