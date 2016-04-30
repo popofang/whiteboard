@@ -15,3 +15,7 @@ console.log('imooc started on port ' + port);
 app.get('/', function (req, res) {
   res.render('index', {});
 });
+
+var http = require('http');
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
