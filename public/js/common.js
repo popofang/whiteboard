@@ -1,4 +1,14 @@
 $(function() {
+	/******** 通讯 ********/
+	var socket = io.connect(window.location.origin);
+
+	socket.on('draw', function(data) {
+		fDrawFree(data.x, data.y, data.color, data.line);
+		console.log(data);
+		ctx.strokeStyle = $('.colors').css('color');
+		ctx.lineWidth = slider.getValue();
+	});
+
 	/******** 工具栏 ********/
 
 	//画笔工具
@@ -142,13 +152,27 @@ $(function() {
 
 	//根据工具选择绘制函数
 	function fDraw(e) { //鼠标移动
+
+		// socket.emit('draw', {
+		// 	sType: sType,
+		// 	e: e,
+		// 	color: ctx.strokeStyle,
+		// 	font: ctx.font.split(' ')[0],
+		// 	wordTip: wordTip,
+		// 	shapeTip: shapeTip
+		// });
+
 		switch(sType) {
-			case "画笔": {
-				fDrawFree(e);
-				break;
-			}
+			case "画笔": 
 			case "橡皮": {
-				fDrawFree(e);
+				fDrawFree(e.pageX, e.pageY);
+				socket.emit('draw', {
+					x: e.pageX,
+					y: e.pageY,
+					color: ctx.strokeStyle,
+					line: ctx.lineWidth,
+					isPaint: bIsPaint
+				});	
 				break;
 			}
 			case "文字": {
@@ -196,19 +220,19 @@ $(function() {
   	});
 
   	//绘制任意线条
-	function fDrawFree(e) {
-		if(bIsPaint) {
-	    	var offset = $("#board").offset();
-	    	var x = e.pageX - offset.left;
-	    	var y = e.pageY - offset.top;
+	function fDrawFree(x, y, color, line) {
+		var offset = $("#board").offset();
+    	var x = x - offset.left;
+    	var y = y - offset.top;
+		if(bIsPaint || (color && line)) {
+			if(color && line) {
+    			ctx.strokeStyle = color;
+    			ctx.lineWidth = line;
+    		}
 			ctx.lineTo(x, y);
 			ctx.stroke();  
         } else {
-			//???????
 			ctx.beginPath();
-		    var offset = $("#board").offset();
-        	var x = e.pageX - offset.left;
-        	var y = e.pageY - offset.top;
 		    ctx.moveTo(x, y);
 		}
 	}
