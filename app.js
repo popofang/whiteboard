@@ -21,9 +21,7 @@ app.get('/', function (req, res) {
 });
 
 socketio.sockets.on('connection', function(socket) {
-    socket.on('draw', function (data) {
-        if(data.isPaint) {
-          socket.broadcast.emit('draw', data);
-        }
-    });
+  socket.on('draw', function (data) {
+    socket.broadcast.emit('draw', data);
+  });
 });

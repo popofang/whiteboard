@@ -1,20 +1,11 @@
 $(function() {
-	/******** 通讯 ********/
-	var socket = io.connect(window.location.origin);
-
-	socket.on('draw', function(data) {
-		fDrawFree(data.x, data.y, data.color, data.line);
-		console.log(data);
-		ctx.strokeStyle = $('.colors').css('color');
-		ctx.lineWidth = slider.getValue();
-	});
 
 	/******** 工具栏 ********/
-
 	//画笔工具
 	$('.draw-options').find('li').children('button').click(function(event) {
 		sType = $(this).attr("aria-label");
 		if(sType == "文字") {
+			bNeedReset = true;
 			slider.options.min = 10;
 			slider.options.max = 40;
 			slider.setValue(10);
@@ -22,7 +13,10 @@ $(function() {
 		} else {
 			slider.options.min = 1;
 			slider.options.max = 20;
-			slider.setValue(1);
+			if(bNeedReset) {
+				slider.setValue(1);
+			}
+			bNeedReset = false;
 			ctx.lineWidth = slider.getValue();
 		}
 		var oUl = $(this).parents('ul');
@@ -71,6 +65,7 @@ $(function() {
 			}
 			case "重置": {
 				fClearBoard();
+				fHistoryAdd();
 				break;
 			}
 		}
@@ -85,6 +80,7 @@ $(function() {
 	var bIsPaint = false; //绘制标识
 	var ctx = $("#board").get(0).getContext("2d"); //画布对象
 	var sType = "画笔"; //工具类型
+	var bNeedReset = false; //重置标识
 
 	//历史记录
 	var aHistory = new Array();
@@ -153,26 +149,10 @@ $(function() {
 	//根据工具选择绘制函数
 	function fDraw(e) { //鼠标移动
 
-		// socket.emit('draw', {
-		// 	sType: sType,
-		// 	e: e,
-		// 	color: ctx.strokeStyle,
-		// 	font: ctx.font.split(' ')[0],
-		// 	wordTip: wordTip,
-		// 	shapeTip: shapeTip
-		// });
-
 		switch(sType) {
 			case "画笔": 
 			case "橡皮": {
-				fDrawFree(e.pageX, e.pageY);
-				socket.emit('draw', {
-					x: e.pageX,
-					y: e.pageY,
-					color: ctx.strokeStyle,
-					line: ctx.lineWidth,
-					isPaint: bIsPaint
-				});	
+				fDrawFree(e);
 				break;
 			}
 			case "文字": {
@@ -196,7 +176,6 @@ $(function() {
 
   	$("#container").mouseup(function(e){ //鼠标放开
         bIsPaint = false;
-        fHistoryAdd(); //增加历史记录	
 		switch(sType) {
 		 	case "画笔":
 		 		break;
@@ -217,18 +196,15 @@ $(function() {
           	 	break;
           	}
 		}
+		fHistoryAdd(); //增加历史记录	
   	});
 
   	//绘制任意线条
-	function fDrawFree(x, y, color, line) {
+	function fDrawFree(e) {
 		var offset = $("#board").offset();
-    	var x = x - offset.left;
-    	var y = y - offset.top;
-		if(bIsPaint || (color && line)) {
-			if(color && line) {
-    			ctx.strokeStyle = color;
-    			ctx.lineWidth = line;
-    		}
+    	var x = e.pageX - offset.left;
+    	var y = e.pageY - offset.top;
+		if(bIsPaint) {
 			ctx.lineTo(x, y);
 			ctx.stroke();  
         } else {
@@ -382,6 +358,7 @@ $(function() {
   	}
 
   	function fDrawLine() { //鼠标放开时绘制直线
+  		ctx.beginPath();
   		ctx.moveTo(nX, nY);
 	    ctx.lineTo(nEndX, nEndY);
 	    ctx.stroke();  
@@ -396,28 +373,37 @@ $(function() {
 		if(nStep < aHistory.length) { 
 			aHistory.length = nStep; 
 	  	}
-	  	aHistory.push($("#board").get(0).toDataURL());
+	  	var sTemp = $("#board").get(0).toDataURL();
+	  	aHistory.push(sTemp);
+
+	  	socket.emit('draw', {
+	  		dataURL: sTemp
+	  	});
   	}
 
   	function fUndraw() { //撤销
 		if (nStep >= 0) {
-	  		fClearBoard();
 	  		nStep--;
-	  		var oTemp = new Image();
-	  		oTemp.src = aHistory[nStep];
-	  		oTemp.onload = function() { 
-	  			ctx.drawImage(oTemp, 0, 0);
-	  		};
+	  		if(nStep == -1) {
+	  			fClearBoard();
+	  		} else {
+	  			var oTemp = new Image();
+	  			oTemp.src = aHistory[nStep];
+	  			oTemp.onload = function() { 
+		  			fClearBoard();
+		  			ctx.drawImage(oTemp, 0, 0);
+	  			};
+	  		}
   		}
 	}
 		    	  
 	function fRedraw() { //重做
 		if (nStep < aHistory.length - 1) {
-			fClearBoard();
 			nStep++;
 			var oTemp = new Image();
 	  		oTemp.src = aHistory[nStep];
 	  		oTemp.onload = function() { 
+	  			fClearBoard();
 	  			ctx.drawImage(oTemp, 0, 0);
 	  		};
 		}
@@ -447,4 +433,26 @@ $(function() {
 	    document.location.href = sDataURL;
 	}
 
+
+	/******** 通讯 ********/
+	var socket = io.connect(window.location.origin);
+
+	socket.on('draw', function(data) {
+		fOtherHistoryAdd(data.dataURL);
+	});
+
+	function fOtherHistoryAdd(dataURL) { //增加历史记录
+	    nStep++;
+		if(nStep < aHistory.length) { 
+			aHistory.length = nStep; 
+	  	}
+	  	var oTemp = new Image();
+	  	oTemp.src = dataURL;
+	  	oTemp.onload = function() { 
+	  		ctx.drawImage(oTemp, 0, 0);
+	  	};
+	  	aHistory.push(dataURL);
+  	}
+
 });
+
