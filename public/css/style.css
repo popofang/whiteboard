@@ -51,3 +51,8 @@ div.tip { border:1px #000 solid; }
 textarea.tip { 
 	background: transparent;
 }
+
+.OCRTip {
+    background: #00e;
+    opacity: 0.3;
+}

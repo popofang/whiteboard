@@ -19,6 +19,7 @@ $(function() {
 			bNeedReset = false;
 			ctx.lineWidth = slider.getValue();
 		}
+
 		var oUl = $(this).parents('ul');
 		if(oUl.attr('class') == 'dropdown-menu tools') {
 			var selected = $(this).children('span').attr('class');
@@ -28,6 +29,7 @@ $(function() {
 			var selected = $(this).children('span').html();
 			oUl.siblings('button').children('span').eq(0).html(selected);
 		}
+
 	});
 
 	$('#colorValue').change(function(event) {
@@ -89,8 +91,13 @@ $(function() {
 	//鼠标拖动需要用的示意框
 	var shapeTip = $("<div class='tip'></div>");
 	var wordTip = $("<textarea class='tip'></textarea>"); 
+	var OCRTip = $("<div class='tip OCRTip'></div>");
+	var OCRCanvas = $("<canvas class='tip'></canvas>");
+
 	$('#container').append(shapeTip);
 	$('#container').append(wordTip);
+	$('#container').append(OCRTip);
+	$('#container').append(OCRCanvas);
 
 	//绑定鼠标绘制事件
 	$('#container').mousemove(fDraw); 
@@ -143,12 +150,14 @@ $(function() {
 			   	});
 				break;    
 			}
+			case "OCR": {
+				break;
+			}
 		}
   	});
 
 	//根据工具选择绘制函数
 	function fDraw(e) { //鼠标移动
-
 		switch(sType) {
 			case "画笔": 
 			case "橡皮": {
@@ -170,6 +179,9 @@ $(function() {
 			case "直线": {
 				fDrawLineTip(e);
 				break;
+			}
+			case "OCR": {
+				fDrawOCRTip(e);
 			}
 		}
 	}
@@ -195,6 +207,25 @@ $(function() {
           		fDrawLine();
           	 	break;
           	}
+          	case "OCR": {
+      			var oImgOCR = ctx.getImageData(nX, nY, nEndX - nX, nEndY - nY);
+      			OCRCanvas.attr({
+      				width: (nEndX - nX),
+      				height: (nEndY - nY)
+      			});
+      			OCRCanvas.get(0).getContext("2d").putImageData(oImgOCR,0,0);
+      			var sDataURL = OCRCanvas.get(0).toDataURL().substring(22);
+      			
+      			//post请求，并返回识别结果
+      			$.post("/OCR", {dataURL:sDataURL}, function(result) {
+      				if(result.status) {
+      					console.log("text:" + result.content);
+      				} else {
+      					console.log("err:" + result.content);
+      				}
+      			});
+          		OCRTip.hide();
+          	}
 		}
 		fHistoryAdd(); //增加历史记录	
   	});
@@ -218,6 +249,7 @@ $(function() {
         var offset = $("#board").offset();
         nEndX = e.pageX - offset.left;
         nEndY = e.pageY - offset.top;
+
         if(bIsPaint) {
          	var nLeftX = nX < nEndX ? nX : nEndX;
          	var nTopY = nY < nEndY ? nY : nEndY;
@@ -415,7 +447,7 @@ $(function() {
 	//用户工具
 	$('.others').find('button').click(function(event) {
 		switch($(this).attr('aria-label')) {
-			case "": {
+			case "用户": {
 				//fUndraw();
 				break;
 			}
@@ -423,13 +455,42 @@ $(function() {
 				fDownloadImg();
 				break;
 			}
+			case "OCR": {
+				sType = "OCR";
+				break;
+			}
 		}
 	});
 
 	function fDownloadImg() { //下载
-		var sDataURL = $("#board").get(0).toDataURL('image/png').replace("image/png", "image/octet-stream");
+
+		var timeStamp = new Date().getTime();//时间戳
+		var sImgOpt = "image/octet-stream;";
+		sImgOpt += "Content-Disposition:attachment;";
+		sImgOpt += "filename='" + timeStamp + ".png'";//图片名
+
+		var sDataURL = $("#board").get(0)
+						.toDataURL('image/png')
+						.replace("image/png", sImgOpt);
 	    document.location.href = sDataURL;
 	}
+
+	function fDrawOCRTip(e) { //根据鼠标绘制OCR示意框
+  	    var offset = $("#board").offset();
+        nEndX = e.pageX - offset.left;
+        nEndY = e.pageY - offset.top;
+        if(bIsPaint) {
+        	var nLeftX = nX < nEndX ? nX : nEndX;
+        	var nTopY = nY < nEndY ? nY : nEndY;
+        	OCRTip.css({
+        		left: nLeftX + offset.left - ctx.lineWidth / 2, 
+        		top: nTopY - ctx.lineWidth / 2
+        	});
+           	OCRTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
+           	OCRTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
+           	OCRTip.show();
+        }
+  	}
 
 
 	/******** 通讯 ********/
@@ -453,4 +514,3 @@ $(function() {
   	}
 
 });
-
