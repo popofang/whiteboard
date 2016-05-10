@@ -56,3 +56,13 @@ textarea.tip {
     background: #00e;
     opacity: 0.3;
 }
+
+.OCR-panel {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.OCR-panel button {
+    margin: 0 3px;
+}
