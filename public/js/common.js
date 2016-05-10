@@ -218,10 +218,9 @@ $(function() {
       			
       			//post请求，并返回识别结果
       			$.post("/OCR", {dataURL:sDataURL}, function(result) {
+      				console.log(result);
       				if(result.status) {
-      					console.log("text:" + result.content);
-      				} else {
-      					console.log("err:" + result.content);
+      					console.log("texts:" + result.texts);
       				}
       			});
           		OCRTip.hide();

@@ -37,21 +37,36 @@ app.post('/OCR', function(req, res) {
 	var dataBuffer = new Buffer(req.body.dataURL, 'base64');
 	
 	fs.writeFile("ocr.png", dataBuffer, function(err) {
+		var status = 0;
 		if(err){
-		  res.send(err);
+		  	res.send({
+		  		status: status,
+		  		texts: err
+		  	});
 		}else{
-			tesseract.process(__dirname + '/ocr.png',function(error, text) {
-				if(err) {
-					res.send({
-						status: 0,
-						content: error
-					});
-				} else {
-  					res.send({
-  						status: 1,
-						content: text
-					});
+
+			var texts = new Array();
+			tesseract.process(__dirname + '/ocr.png', function(error, text) {
+				if(!error) {
+					status = 1;
+					texts.push(text);
 				}
+
+				//中文识别
+				var options = {
+				    l: 'chi_sim',
+				    psm: 6
+				};
+				tesseract.process(__dirname + '/ocr.png', options, function(error, text) {
+					if(!error) {
+						status = 1;
+						texts.push(text);
+					}
+					res.send({
+						status: status,
+						texts: texts
+					});
+				});
 			});
 		}
 	});
