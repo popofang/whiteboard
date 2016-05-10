@@ -218,9 +218,11 @@ $(function() {
       			
       			//post请求，并返回识别结果
       			$.post("/OCR", {dataURL:sDataURL}, function(result) {
-      				console.log(result);
       				if(result.status) {
-      					console.log("texts:" + result.texts);
+      					console.log(result.texts);
+      					for(var i = 0; i < result.texts.length; i++) {
+      						$('.OCR-panel').find('li')[i].innerHTML = result.texts[i];
+      					}
       				}
       			});
           		OCRTip.hide();
@@ -253,11 +255,11 @@ $(function() {
          	var nLeftX = nX < nEndX ? nX : nEndX;
          	var nTopY = nY < nEndY ? nY : nEndY;
         	wordTip.css({
-         		left: nLeftX + offset.left - ctx.lineWidth / 2, 
-         		top: nTopY - ctx.lineWidth / 2
+         		left: nLeftX + offset.left, 
+         		top: nTopY
          	});
-        	wordTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
-        	wordTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
+        	wordTip.width(Math.abs(nEndX - nX));
+        	wordTip.height(Math.abs(nEndY - nY));
            	wordTip.attr({
            		placeholder: '在此输入',
            	});
@@ -482,11 +484,11 @@ $(function() {
         	var nLeftX = nX < nEndX ? nX : nEndX;
         	var nTopY = nY < nEndY ? nY : nEndY;
         	OCRTip.css({
-        		left: nLeftX + offset.left - ctx.lineWidth / 2, 
-        		top: nTopY - ctx.lineWidth / 2
+        		left: nLeftX + offset.left, 
+        		top: nTopY
         	});
-           	OCRTip.width(Math.abs(nEndX - nX) - ctx.lineWidth);
-           	OCRTip.height(Math.abs(nEndY - nY) - ctx.lineWidth);
+           	OCRTip.width(Math.abs(nEndX - nX));
+           	OCRTip.height(Math.abs(nEndY - nY));
            	OCRTip.show();
         }
   	}

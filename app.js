@@ -46,10 +46,18 @@ app.post('/OCR', function(req, res) {
 		}else{
 
 			var texts = new Array();
-			tesseract.process(__dirname + '/ocr.png', function(error, text) {
+
+			//英文识别
+			var options = {
+			    l: 'eng',
+			    psm: 6
+			};
+			tesseract.process(__dirname + '/ocr.png', options, function(error, text) {
 				if(!error) {
 					status = 1;
 					texts.push(text);
+				} else {
+					texts.push("无法识别");
 				}
 
 				//中文识别
@@ -61,6 +69,8 @@ app.post('/OCR', function(req, res) {
 					if(!error) {
 						status = 1;
 						texts.push(text);
+					} else {
+						texts.push("无法识别");
 					}
 					res.send({
 						status: status,
