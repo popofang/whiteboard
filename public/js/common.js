@@ -6,9 +6,9 @@ $(function() {
 		sType = $(this).attr("aria-label");
 		if(sType == "文字") {
 			bNeedReset = true;
-			slider.options.min = 10;
+			slider.options.min = 14;
 			slider.options.max = 40;
-			slider.setValue(16);
+			slider.setValue(20);
 			ctx.font = slider.getValue() + "px Arial";
 		} else {
 			slider.options.min = 1;
@@ -215,15 +215,9 @@ $(function() {
       			});
       			OCRCanvas.get(0).getContext("2d").putImageData(oImgOCR,0,0);
       			var sDataURL = OCRCanvas.get(0).toDataURL().substring(22);
+
+      			socket.emit('OCR', sDataURL); //发送文字识别请求
       			
-      			//post请求，并返回识别结果
-      			$.post("/OCR", {dataURL:sDataURL}, function(result) {
-      				if(result.status) {
-      					for(var i = 0; i < result.texts.length; i++) {
-      						$('.OCR-panel').find('li')[i].innerHTML = result.texts[i];
-      					}
-      				}
-      			});
           		OCRTip.hide();
           	}
 		}
@@ -406,9 +400,7 @@ $(function() {
 	  	var sTemp = $("#board").get(0).toDataURL();
 	  	aHistory.push(sTemp);
 
-	  	socket.emit('draw', {
-	  		dataURL: sTemp
-	  	});
+	  	socket.emit('draw', sTemp);
   	}
 
   	function fUndraw() { //撤销
@@ -496,15 +488,27 @@ $(function() {
 	/******** 通讯 ********/
 	var socket = io.connect(window.location.origin);
 
+	//画板初始化
 	socket.on('init', function(data) {
-		fOtherHistoryAdd(data.dataURL);
+		fOtherHistoryAdd(data);
 	});
 
+	//画板同步
 	socket.on('draw', function(data) {
-		fOtherHistoryAdd(data.dataURL);
+		fOtherHistoryAdd(data);
 	});
 
-	function fOtherHistoryAdd(dataURL) { //增加历史记录
+	//OCR
+	socket.on('OCR', function(data) {
+		if(data.status) {
+			for(var i = 0; i < data.texts.length; i++) {
+				$('.OCR-panel').find('li')[i].innerHTML = data.texts[i];
+			}
+		}
+	});
+
+	//增加其他用户历史记录
+	function fOtherHistoryAdd(dataURL) { 
 		if(dataURL) {
 			nStep++;
 			if(nStep < aHistory.length) { 

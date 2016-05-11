@@ -10,15 +10,6 @@ var socketio = require('socket.io').listen(server);
 
 app.set('views', './views');
 app.set('view engine', 'pug');
-
-//bodyParser
-app.use(bodyParser.json({
-	limit: '1mb'
-}));  //指定参数使用 json 格式
-app.use(bodyParser.urlencoded({
-  extended: true
-})); 
-
 app.use(express.static(path.join(__dirname, 'bower_components')));
 app.use(express.static(path.join(__dirname, 'public')));
 server.listen(port);
@@ -33,13 +24,30 @@ app.get('/', function(req, res) {
 var fs = require('fs');
 var tesseract = require('node-tesseract');
 
-app.post('/OCR', function(req, res) {
-	var dataBuffer = new Buffer(req.body.dataURL, 'base64');
+//socket通讯
+var nUsers = 0; //初始接入用户
+var sCurrent = ''; //暂存当前画板内容
+socketio.sockets.on('connection', function(socket) {
+
+	nUsers++;
+
+	//初始化
+	socket.emit('init', sCurrent);
+
+	//同步画布
+  	socket.on('draw', function(data) {
+  		sCurrent = data;
+    	socket.broadcast.emit('draw', data);
+  	});
+
+  	//文字识别
+  	socket.on('OCR', function(data) {
+  		var dataBuffer = new Buffer(data, 'base64');
 	
-	fs.writeFile("ocr.png", dataBuffer, function(err) {
+		fs.writeFile("ocr.png", dataBuffer, function(err) {
 		var status = 0;
 		if(err){
-		  	res.send({
+		  	socket.emit('OCR', {
 		  		status: status,
 		  		texts: err
 		  	});
@@ -72,35 +80,20 @@ app.post('/OCR', function(req, res) {
 					} else {
 						texts.push("无法识别");
 					}
-					res.send({
-						status: status,
-						texts: texts
-					});
+					socket.emit('OCR', {
+				  		status: status,
+				  		texts: texts
+				  	});
 				});
 			});
 		}
 	});
-});
-
-//socket通讯
-var nUsers = 0;
-var sCurrent = '';
-socketio.sockets.on('connection', function(socket) {
-	nUsers++;
-
-	//初始化
-	socket.emit('init', sCurrent);
-
-	//同步画布
-  	socket.on('draw', function(data) {
-  		sCurrent = data;
-    	socket.broadcast.emit('draw', data);
   	});
 
 	//断开连接
   	socket.on('disconnect', function() {
   		nUsers--;
-  		if(nUsers == 0) {
+  		if(nUsers == 0) { //用户为空时，画板数据清空
   			sCurrent = '';
   		}
   	});
