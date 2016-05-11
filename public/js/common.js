@@ -8,7 +8,7 @@ $(function() {
 			bNeedReset = true;
 			slider.options.min = 10;
 			slider.options.max = 40;
-			slider.setValue(10);
+			slider.setValue(16);
 			ctx.font = slider.getValue() + "px Arial";
 		} else {
 			slider.options.min = 1;
@@ -219,7 +219,6 @@ $(function() {
       			//post请求，并返回识别结果
       			$.post("/OCR", {dataURL:sDataURL}, function(result) {
       				if(result.status) {
-      					console.log(result.texts);
       					for(var i = 0; i < result.texts.length; i++) {
       						$('.OCR-panel').find('li')[i].innerHTML = result.texts[i];
       					}
@@ -497,21 +496,26 @@ $(function() {
 	/******** 通讯 ********/
 	var socket = io.connect(window.location.origin);
 
+	socket.on('init', function(data) {
+		fOtherHistoryAdd(data.dataURL);
+	});
+
 	socket.on('draw', function(data) {
 		fOtherHistoryAdd(data.dataURL);
 	});
 
 	function fOtherHistoryAdd(dataURL) { //增加历史记录
-	    nStep++;
-		if(nStep < aHistory.length) { 
-			aHistory.length = nStep; 
-	  	}
-	  	var oTemp = new Image();
-	  	oTemp.src = dataURL;
-	  	oTemp.onload = function() { 
-	  		ctx.drawImage(oTemp, 0, 0);
-	  	};
-	  	aHistory.push(dataURL);
+		if(dataURL) {
+			nStep++;
+			if(nStep < aHistory.length) { 
+				aHistory.length = nStep; 
+		  	}
+		  	var oTemp = new Image();
+		  	oTemp.src = dataURL;
+		  	oTemp.onload = function() { 
+		  		ctx.drawImage(oTemp, 0, 0);
+		  	};
+		  	aHistory.push(dataURL);
+		}
   	}
-
 });

@@ -83,9 +83,30 @@ app.post('/OCR', function(req, res) {
 });
 
 //socket通讯
+var nUsers = 0;
+var sCurrent = '';
 socketio.sockets.on('connection', function(socket) {
+	nUsers++;
+
+	//初始化
+	socket.emit('init', sCurrent);
+
+	//同步画布
   	socket.on('draw', function(data) {
+  		sCurrent = data;
     	socket.broadcast.emit('draw', data);
   	});
+
+	//断开连接
+  	socket.on('disconnect', function() {
+  		nUsers--;
+  		if(nUsers == 0) {
+  			sCurrent = '';
+  		}
+  	});
 });
+
+
+
+
 
