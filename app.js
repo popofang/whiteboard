@@ -32,7 +32,9 @@ socketio.sockets.on('connection', function(socket) {
 	nUsers++;
 
 	//初始化
-	socket.emit('init', sCurrent);
+	if(sCurrent !== '') {
+		socket.emit('init', sCurrent);
+	}
 
 	//同步画布
   	socket.on('draw', function(data) {
@@ -45,32 +47,19 @@ socketio.sockets.on('connection', function(socket) {
   		var dataBuffer = new Buffer(data, 'base64');
 	
 		fs.writeFile("ocr.png", dataBuffer, function(err) {
-		var status = 0;
-		if(err){
-		  	socket.emit('OCR', {
-		  		status: status,
-		  		texts: err
-		  	});
-		}else{
+			var status = 0;
+			if(err){
+			  	socket.emit('OCR', {
+			  		status: status,
+			  		texts: err
+			  	});
+			} else{
 
-			var texts = new Array();
+				var texts = new Array();
 
-			//英文识别
-			var options = {
-			    l: 'eng',
-			    psm: 6
-			};
-			tesseract.process(__dirname + '/ocr.png', options, function(error, text) {
-				if(!error) {
-					status = 1;
-					texts.push(text);
-				} else {
-					texts.push("无法识别");
-				}
-
-				//中文识别
+				//英文识别
 				var options = {
-				    l: 'chi_sim',
+				    l: 'eng',
 				    psm: 6
 				};
 				tesseract.process(__dirname + '/ocr.png', options, function(error, text) {
@@ -80,15 +69,28 @@ socketio.sockets.on('connection', function(socket) {
 					} else {
 						texts.push("无法识别");
 					}
-					socket.emit('OCR', {
-				  		status: status,
-				  		texts: texts
-				  	});
+
+					//中文识别
+					var options = {
+					    l: 'chi_sim',
+					    psm: 6
+					};
+					tesseract.process(__dirname + '/ocr.png', options, function(error, text) {
+						if(!error) {
+							status = 1;
+							texts.push(text);
+						} else {
+							texts.push("无法识别");
+						}
+						socket.emit('OCR', {
+					  		status: status,
+					  		texts: texts
+					  	});
+					});
 				});
-			});
-		}
+			}
+		});
 	});
-  	});
 
 	//断开连接
   	socket.on('disconnect', function() {
@@ -98,8 +100,3 @@ socketio.sockets.on('connection', function(socket) {
   		}
   	});
 });
-
-
-
-
-

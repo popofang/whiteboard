@@ -79,6 +79,7 @@ $(function() {
 
 	//初始参数
 	var nX, nY, nEndX, nEndY;
+	var nMinX, nMinY, nMaxX, nMaxY;
 	var bIsPaint = false; //绘制标识
 	var ctx = $("#board").get(0).getContext("2d"); //画布对象
 	var sType = "画笔"; //工具类型
@@ -108,6 +109,10 @@ $(function() {
         var offset = $("#board").offset();
         nX = e.pageX - offset.left;
 		nY = e.pageY - offset.top;
+
+		nMinX = nMaxX = nX;
+		nMinY = nMaxY = nY;
+
 		//判断工具类型执行相应函数
 		switch(sType) {
 		 	case "画笔": {
@@ -182,6 +187,7 @@ $(function() {
 			}
 			case "OCR": {
 				fDrawOCRTip(e);
+				break;
 			}
 		}
 	}
@@ -189,12 +195,15 @@ $(function() {
   	$("#container").mouseup(function(e){ //鼠标放开
         bIsPaint = false;
 		switch(sType) {
-		 	case "画笔":
+		 	case "画笔": {
+		 		fDoOCR(nMinX, nMinY, nMaxX - nMinX, nMaxY - nMinY);
 		 		break;
+		 	}
           	case "橡皮":
           		break;
-          	case "文字":
+          	case "文字": {
           	 	break;
+          	}
           	case "矩形": {
           		fDrawRect();
           	 	break;
@@ -208,17 +217,8 @@ $(function() {
           	 	break;
           	}
           	case "OCR": {
-      			var oImgOCR = ctx.getImageData(nX, nY, nEndX - nX, nEndY - nY);
-      			OCRCanvas.attr({
-      				width: (nEndX - nX),
-      				height: (nEndY - nY)
-      			});
-      			OCRCanvas.get(0).getContext("2d").putImageData(oImgOCR,0,0);
-      			var sDataURL = OCRCanvas.get(0).toDataURL().substring(22);
-
-      			socket.emit('OCR', sDataURL); //发送文字识别请求
-      			
-          		OCRTip.hide();
+          		fDoOCR(nX, nY, nEndX - nX, nEndY - nY);
+          		break;
           	}
 		}
 		fHistoryAdd(); //增加历史记录	
@@ -227,14 +227,21 @@ $(function() {
   	//绘制任意线条
 	function fDrawFree(e) {
 		var offset = $("#board").offset();
-    	var x = e.pageX - offset.left;
-    	var y = e.pageY - offset.top;
+    	nEndX = e.pageX - offset.left;
+    	nEndY = e.pageY - offset.top;
+
+    	//画笔范围
+    	nMinX = nMinX < nEndX ? nMinX : nEndX;
+    	nMinY = nMinY < nEndY ? nMinY : nEndY;
+    	nMaxX = nMaxX > nEndX ? nMaxX : nEndX;
+    	nMaxY = nMaxY > nEndY ? nMaxY : nEndY;
+
 		if(bIsPaint) {
-			ctx.lineTo(x, y);
+			ctx.lineTo(nEndX, nEndY);
 			ctx.stroke();  
         } else {
 			ctx.beginPath();
-		    ctx.moveTo(x, y);
+		    ctx.moveTo(nEndX, nEndY);
 		}
 	}
 
@@ -270,9 +277,10 @@ $(function() {
 		    var nFontSize = ctx.font.split('px')[0] - 0;
 		    ctx.fillStyle = ctx.strokeStyle;
 		    ctx.fillText(word, offset2.left - offset.left, offset2.top - offset.top + nFontSize);
-    	  	wordTip.val(""); 
+    	  	wordTip.val(""); //清空已有文字
 		}
 		wordTip.hide();
+		fDoOCR(offset2.left - offset.left, offset2.top - offset.top, nFontSize * word.length, nFontSize);
   	}
 
 	//绘制矩形
@@ -459,7 +467,7 @@ $(function() {
 		var timeStamp = new Date().getTime();//时间戳
 		var sImgOpt = "image/octet-stream;";
 		sImgOpt += "Content-Disposition:attachment;";
-		sImgOpt += "filename='" + timeStamp + ".png'";//图片名
+		sImgOpt += "filename=" + timeStamp + ".png";//图片名
 
 		var sDataURL = $("#board").get(0)
 						.toDataURL('image/png')
@@ -484,6 +492,19 @@ $(function() {
         }
   	}
 
+  	function fDoOCR(x, y, width, height) {
+  		var oImgOCR = ctx.getImageData(x, y, width, height);
+		OCRCanvas.attr({
+			width: width,
+			height: height
+		});
+		OCRCanvas.get(0).getContext("2d").putImageData(oImgOCR,0,0);
+		var sDataURL = OCRCanvas.get(0).toDataURL().substring(22);
+		socket.emit('OCR', sDataURL); //发送文字识别请求
+		
+		OCRTip.hide();
+  	}
+
 
 	/******** 通讯 ********/
 	var socket = io.connect(window.location.origin);
@@ -502,7 +523,11 @@ $(function() {
 	socket.on('OCR', function(data) {
 		if(data.status) {
 			for(var i = 0; i < data.texts.length; i++) {
-				$('.OCR-panel').find('li')[i].innerHTML = data.texts[i];
+				if(data.texts[i] !== '') {
+					$('.OCR-panel').find('input')[i].value = data.texts[i];
+				} else {
+					$('.OCR-panel').find('input')[i].value = '无法识别';
+				}
 			}
 		}
 	});

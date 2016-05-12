@@ -67,8 +67,10 @@ block content
 			.col-md-12#container
 				input#colorValue(type="hidden")
 				.panel.panel-default.OCR-panel
-					.panel-body
+					.panel-body OCR
 					ul.list-group
-						li.list-group-item 英文识别
-						li.list-group-item 简体中文识别
+						li.list-group-item
+							input(type='text' placeholder='英文识别')
+						li.list-group-item
+							input(type='text' placeholder='简体中文识别')
 				canvas#board

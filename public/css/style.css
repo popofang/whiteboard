@@ -60,9 +60,16 @@ textarea.tip {
 .OCR-panel {
     position: fixed;
     bottom: 0;
-    right: 0;
+    right: 5px;
 }
 
-.OCR-panel button {
-    margin: 0 3px;
+.OCR-panel .panel-body {
+    font-size: 17px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.OCR-panel input {
+    outline: none;
+    border: none;
 }
