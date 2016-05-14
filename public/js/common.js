@@ -57,17 +57,13 @@ $(function() {
 	//操作工具
 	$('.operations').find('button').click(function(event) {
 		switch($(this).attr('aria-label')) {
-			case "撤销": {
-				fUndraw();
-				break;
-			}
+			case "撤销": 
 			case "重做": {
-				fRedraw();
+				//socket.emit('history', nStep);
 				break;
 			}
 			case "重置": {
 				fClearBoard();
-				fHistoryAdd();
 				break;
 			}
 		}
@@ -86,7 +82,6 @@ $(function() {
 	var bNeedReset = false; //重置标识
 
 	//历史记录
-	var aHistory = new Array();
 	var nStep = -1;
 
 	//鼠标拖动需要用的示意框
@@ -196,7 +191,7 @@ $(function() {
         bIsPaint = false;
 		switch(sType) {
 		 	case "画笔": {
-		 		fDoOCR(nMinX, nMinY, nMaxX - nMinX, nMaxY - nMinY);
+		 		fDoOCR(nMinX - ctx.lineWidth / 2, nMinY - ctx.lineWidth / 2, nMaxX - nMinX + ctx.lineWidth, nMaxY - nMinY + ctx.lineWidth);
 		 		break;
 		 	}
           	case "橡皮":
@@ -221,7 +216,15 @@ $(function() {
           		break;
           	}
 		}
-		fHistoryAdd(); //增加历史记录	
+
+		//同步画板内容
+		if(sType !== '文字' && sType !== 'OCR') {
+			var sTemp = $("#board").get(0).toDataURL();
+	  		socket.emit('draw', {
+	  			dataURL: sTemp,
+	  			word: $('.OCR-panel').find('input').val()
+	  		});
+		}
   	});
 
   	//绘制任意线条
@@ -280,7 +283,16 @@ $(function() {
     	  	wordTip.val(""); //清空已有文字
 		}
 		wordTip.hide();
-		fDoOCR(offset2.left - offset.left, offset2.top - offset.top, nFontSize * word.length, nFontSize);
+
+		//显示输入文本
+		$('.OCR-panel').find('input').val(word);
+
+		//同步画板内容和OCR框
+		var sTemp = $("#board").get(0).toDataURL();
+	  	socket.emit('draw', {
+	  		dataURL: sTemp,
+	  		word: word
+	  	});
   	}
 
 	//绘制矩形
@@ -400,16 +412,6 @@ $(function() {
 
 
   	//操作工具函数
-  	function fHistoryAdd() { //增加历史记录
-	    nStep++;
-		if(nStep < aHistory.length) { 
-			aHistory.length = nStep; 
-	  	}
-	  	var sTemp = $("#board").get(0).toDataURL();
-	  	aHistory.push(sTemp);
-
-	  	socket.emit('draw', sTemp);
-  	}
 
   	function fUndraw() { //撤销
 		if (nStep >= 0) {
@@ -447,10 +449,6 @@ $(function() {
 	//用户工具
 	$('.others').find('button').click(function(event) {
 		switch($(this).attr('aria-label')) {
-			case "用户": {
-				//fUndraw();
-				break;
-			}
 			case "下载": {
 				fDownloadImg();
 				break;
@@ -519,32 +517,40 @@ $(function() {
 		fOtherHistoryAdd(data);
 	});
 
+	//历史记录
+	socket.on('history', function(data) {
+		var oTemp = new Image();
+	  	oTemp.src = data;
+	  	oTemp.onload = function() { 
+	  		ctx.drawImage(oTemp, 0, 0);
+	  	};
+	});
+
 	//OCR
 	socket.on('OCR', function(data) {
 		if(data.status) {
 			for(var i = 0; i < data.texts.length; i++) {
 				if(data.texts[i] !== '') {
-					$('.OCR-panel').find('input')[i].value = data.texts[i];
+					$('.OCR-panel').find('input').val(data.texts[i]);
 				} else {
-					$('.OCR-panel').find('input')[i].value = '无法识别';
+					$('.OCR-panel').find('input').val('无法识别');
 				}
 			}
 		}
 	});
 
 	//增加其他用户历史记录
-	function fOtherHistoryAdd(dataURL) { 
-		if(dataURL) {
-			nStep++;
-			if(nStep < aHistory.length) { 
-				aHistory.length = nStep; 
-		  	}
+	function fOtherHistoryAdd(data) { 
+		if(data) {
+			nStep = data.seq;
 		  	var oTemp = new Image();
-		  	oTemp.src = dataURL;
+		  	oTemp.src = data.dataURL;
 		  	oTemp.onload = function() { 
 		  		ctx.drawImage(oTemp, 0, 0);
 		  	};
-		  	aHistory.push(dataURL);
+		  	if(data.word) {
+		  		$('.OCR-panel').find('input').val(data.word);
+		  	}
 		}
   	}
 });
