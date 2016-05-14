@@ -7,9 +7,13 @@ var HistorySchema = new mongoose.Schema({
 
 HistorySchema.statics = {
 	findBySeq: function(seq, cb) {
-		return this.findOne({seq: seq});
-		exec(cb);
-	}
+		return this.findOne({seq: seq}).exec(cb);
+	},
+	deleteAll: function(seq, cb) {
+		for(var i = 0; i <= seq; i++) {
+			this.remove({seq: i}).exec(cb);
+		}
+	} 
 }
 
 module.exports = HistorySchema;

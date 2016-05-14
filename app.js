@@ -46,9 +46,8 @@ socketio.sockets.on('connection', function(socket) {
 			if(err) {
 				console.log(err);
 			} else {
-				console.log('data:' + result);
+				socket.emit('init', result);
 			}
-			socket.emit('history', result);
 		});
 	}
 
@@ -58,13 +57,13 @@ socketio.sockets.on('connection', function(socket) {
   		console.log('seq:' + seq);
   		var history = new History({ 
   			seq: seq,
-  			dataURL: data.dataURL 
+  			dataURL: data.dataURL,
   		});
 
   		history.save(function(err) {
   			if(err) {
-  				console.log('同步失败:' + err);
-  			} 
+  				console.log('数据添加失败:' + err);
+  			}
   		});
 
 		socket.broadcast.emit('draw', {
@@ -72,13 +71,18 @@ socketio.sockets.on('connection', function(socket) {
 			dataURL: data.dataURL,
 			word: data.word
 		});
+
+		socket.emit('seqSync', seq);
   	});
 
   	//重现历史记录
   	socket.on('history', function(data) {
   		History.findBySeq(data, function(err, result) {
-  			console.log(result);
-  			socket.emit('history', result);
+  			if(err) {
+  				console.log('读取数据出错:' + err);
+  			} else {
+  				socket.emit('history', result);
+  			}
   		});
   	});
 
@@ -109,6 +113,7 @@ socketio.sockets.on('connection', function(socket) {
 				    l: 'eng',
 				    psm: 6
 				};
+
 				tesseract.process(__dirname + '/ocr.png', options, function(error, text) {
 					if(!error) {
 						status = 1;
@@ -122,6 +127,7 @@ socketio.sockets.on('connection', function(socket) {
 					    l: 'chi_sim',
 					    psm: 6
 					};
+
 					tesseract.process(__dirname + '/ocr.png', options, function(error, text) {
 						if(!error) {
 							status = 1;
@@ -152,8 +158,14 @@ socketio.sockets.on('connection', function(socket) {
   		console.log('User Exit:' + nUsers);
   		if(nUsers == 0) { //用户为空时，画板数据清空
   			console.log('No User, over');
+  			History.deleteAll(seq, function(err) {
+  				if(err) {
+  					console.log('删除数据出错:' + err);
+  				} else {
+  					console.log('删除成功');
+  				}
+  			});
   			seq = -1;
-  			History.remove();
   		}
   	});
 });
