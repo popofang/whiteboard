@@ -57,7 +57,7 @@ $(function() {
 	//操作工具
 	$('.operations').find('button').click(function(event) {
 		switch($(this).attr('aria-label')) {
-			case "撤销": {
+			case "下一步": {
 				nSeq--;
 				if(nSeq >= 0) {
 					socket.emit('history', nSeq);
@@ -66,7 +66,7 @@ $(function() {
 				}
 				break;
 			} 
-			case "重做": {
+			case "上一步": {
 				nSeq++;
 				socket.emit('history', nSeq);
 				break;
