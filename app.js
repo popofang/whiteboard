@@ -15,7 +15,6 @@ mongoose.connect('mongodb://localhost/whiteboard');
 
 app.set('views', './views');
 app.set('view engine', 'pug');
-app.use(express.static(path.join(__dirname, 'bower_components')));
 app.use(express.static(path.join(__dirname, 'public')));
 server.listen(port);
 

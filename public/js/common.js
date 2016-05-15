@@ -57,7 +57,7 @@ $(function() {
 	//操作工具
 	$('.operations').find('button').click(function(event) {
 		switch($(this).attr('aria-label')) {
-			case "下一步": {
+			case "上一步": {
 				nSeq--;
 				if(nSeq >= 0) {
 					socket.emit('history', nSeq);
@@ -66,7 +66,7 @@ $(function() {
 				}
 				break;
 			} 
-			case "上一步": {
+			case "下一步": {
 				nSeq++;
 				socket.emit('history', nSeq);
 				break;
@@ -114,6 +114,7 @@ $(function() {
         nX = e.pageX - offset.left;
 		nY = e.pageY - offset.top;
 
+		//初始化画笔范围
 		nMinX = nMaxX = nX;
 		nMinY = nMaxY = nY;
 
@@ -358,7 +359,7 @@ $(function() {
 	   	ctx.save();
 	   	ctx.scale(nRatioX, nRatioY); //进行缩放（均匀压缩）
 	   	ctx.beginPath();
-	   	//从椭圆的左端点开始逆时针绘制
+	   	//从椭圆的右端点开始顺时针绘制
 	   	ctx.moveTo((nOvalX + nOvalA) / nRatioX, nOvalY / nRatioY);
 	   	ctx.arc(nOvalX / nRatioX, nOvalY / nRatioY, nOvalR, 0, 2 * Math.PI);
 	   	ctx.closePath();
@@ -384,25 +385,20 @@ $(function() {
 			var nLength = Math.sqrt(Math.pow(nEndX - nX, 2) + Math.pow(nEndY - nY, 2));
 			shapeTip.height(nLength - ctx.lineWidth);
 
-			//设置旋转原点
-        	var sOriginX = 0;
-        	var sOriginY = 0;
-			var sTransformOrigin = sOriginX + ' ' + sOriginY;
-
 			//设置旋转角度
 			var nDegree = - Math.atan2(nEndX - nX, nEndY - nY) / Math.PI * 180;
 			var sRotate = 'rotate(' + nDegree + 'deg)';
 			shapeTip.css({
 				'transform': sRotate,
-				'transform-origin': sTransformOrigin,
+				'transform-origin': '0 0',
 				'-ms-transform': sRotate, /* IE 9 */
-				'-ms-transform-origin': sTransformOrigin, /* IE 9 */
+				'-ms-transform-origin': '0 0', /* IE 9 */
 				'-webkit-transform': sRotate, /* Safari and Chrome */
-				'-webkit-transform-origin': sTransformOrigin, /* Safari and Chrome */
+				'-webkit-transform-origin': '0 0', /* Safari and Chrome */
 				'-moz-transform': sRotate, /* Firefox */
-				'-moz-transform-origin': sTransformOrigin, /* Firefox */
+				'-moz-transform-origin': '0 0', /* Firefox */
 				'-o-transform': sRotate, /* Opera */
-				'-o-transform-origin': sTransformOrigin /* Opera */
+				'-o-transform-origin': '0 0' /* Opera */
 			});
 			shapeTip.show();
         }
