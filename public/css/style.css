@@ -41,6 +41,10 @@ button span { width: 100%; }
 
 .others>.btn-group { float: right; }
 
+#board {
+    cursor: crosshair;
+}
+
 .tip {
 	 position:absolute;
 	 display:none;

@@ -1,25 +1,30 @@
 $(function() {
 
 	/******** 工具栏 ********/
-	//画笔工具
+	//画笔工具栏
 	$('.draw-options').find('li').children('button').click(function(event) {
+
+		//由aria-label确认所选功能
 		sType = $(this).attr("aria-label");
-		if(sType == "文字") {
+
+		//拖动条属性重设
+		if(sType == "文字") { //拖动条文字重设
 			bNeedReset = true;
 			slider.options.min = 14;
 			slider.options.max = 40;
 			slider.setValue(20);
-			ctx.font = slider.getValue() + "px Arial";
-		} else {
+			ctx.font = slider.getValue() + "px Arial"; //文字大小由font属性指定
+		} else { //拖动条笔触粗细重设
 			slider.options.min = 1;
 			slider.options.max = 20;
 			if(bNeedReset) {
 				slider.setValue(1);
 			}
 			bNeedReset = false;
-			ctx.lineWidth = slider.getValue();
+			ctx.lineWidth = slider.getValue(); //笔触粗细由font属性指定
 		}
 
+		//将所选中的功能替换至功能列表头显示的span中
 		var oUl = $(this).parents('ul');
 		if(oUl.attr('class') == 'dropdown-menu tools') {
 			var selected = $(this).children('span').attr('class');
@@ -32,12 +37,14 @@ $(function() {
 
 	});
 
+	//调色板
 	$('#colorValue').change(function(event) {
 		$('.colors').css('color', '#' + this.value);
 		ctx.strokeStyle = '#' + this.value;
 	});
 
-	var slider = new Slider('.stroke', {
+	//拖动条
+	var slider = new Slider('.stroke', { //初始化
 		reversed : true,
 		tooltip: 'always',
 		min: 1,
@@ -49,9 +56,12 @@ $(function() {
 		}
 	});
 
-	slider.on("slideStop", function() {
-		ctx.lineWidth = slider.getValue();
-		ctx.font = slider.getValue() + "px Arial";
+	slider.on("slideStop", function() { //拖动条数值改变的监听
+		if(sType == "文字") {
+			ctx.font = slider.getValue() + "px Arial";
+		} else {
+			ctx.lineWidth = slider.getValue();
+		}
 	});
 
 	//操作工具
