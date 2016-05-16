@@ -74,6 +74,10 @@ socketio.sockets.on('connection', function(socket) {
 		socket.emit('seqSync', seq);
   	});
 
+  	socket.on('reset', function() {
+  		socket.broadcast.emit('reset');
+  	});
+
   	//重现历史记录
   	socket.on('history', function(data) {
   		History.findBySeq(data, function(err, result) {

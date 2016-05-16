@@ -56,6 +56,29 @@ $(function() {
 		}
 	});
 
+	//重置工具
+	$('.reset').click(function(event) {
+		//确认框
+		bootbox.confirm({ 
+			title: "确认框",
+			buttons: {  
+	            confirm: {  
+	                label: '确认'
+	            },  
+	            cancel: {  
+	                label: '取消' 
+	            }  
+	        },  
+		    message: '该操作会影响所有在线用户，确定清空画板？', 
+		    callback: function(result){ 
+		    	if(result) {
+		    		fClearBoard();
+		    		socket.emit('reset');
+		    	}
+		    }
+		});
+	});
+
 	slider.on("slideStop", function() { //拖动条数值改变的监听
 		if(sType == "文字") {
 			ctx.font = slider.getValue() + "px Arial";
@@ -79,10 +102,6 @@ $(function() {
 			case "下一步": {
 				nSeq++;
 				socket.emit('history', nSeq);
-				break;
-			}
-			case "重置": {
-				fClearBoard();
 				break;
 			}
 		}
@@ -503,6 +522,11 @@ $(function() {
 
 	socket.on('seqSync', function(data) {
 		nSeq = data;
+	});
+
+	//画板重置
+	socket.on('reset', function(data) {
+		fClearBoard();
 	});
 
 	//历史记录

@@ -39,6 +39,10 @@ button span { width: 100%; }
 
 .slider { margin: 10px 0; }
 
+.modal-footer {
+    border: none;
+}
+
 .others>.btn-group { float: right; }
 
 #board {
