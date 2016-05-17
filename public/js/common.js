@@ -73,7 +73,11 @@ $(function() {
 		    callback: function(result){ 
 		    	if(result) {
 		    		fClearBoard();
+		    		console.log(Date() + ' 确认，画板已清空');
+		    		$('.OCR-panel').find('input').val('');
 		    		socket.emit('reset');
+		    	} else {
+		    		console.log(Date() + ' 取消，画板未清空');
 		    	}
 		    }
 		});
@@ -241,23 +245,28 @@ $(function() {
 		switch(sType) {
 		 	case "画笔": {
 		 		fDoOCR(nMinX - ctx.lineWidth / 2, nMinY - ctx.lineWidth / 2, nMaxX - nMinX + ctx.lineWidth, nMaxY - nMinY + ctx.lineWidth);
+		 		console.log(Date() + ' 画笔绘制');
 		 		break;
 		 	}
           	case "橡皮":
+          		console.log(Date() + ' 橡皮擦除');
           		break;
           	case "文字": {
           	 	break;
           	}
           	case "矩形": {
           		fDrawRect();
+          		console.log(Date() + ' 矩形绘制');
           	 	break;
           	}
           	case "椭圆": {
           		fDrawOval();
+          		console.log(Date() + ' 椭圆绘制');
           	 	break;
           	}
           	case "直线":	{
           		fDrawLine();
+          		console.log(Date() + ' 直线绘制');
           	 	break;
           	}
           	case "OCR": {
@@ -270,7 +279,8 @@ $(function() {
 		if(sType !== '文字' && sType !== 'OCR') {
 			var sTemp = $("#board").get(0).toDataURL();
 	  		socket.emit('draw',  {
-	  			dataURL: sTemp});
+	  			dataURL: sTemp
+	  		});
 		}
   	});
 
@@ -330,6 +340,7 @@ $(function() {
     	  	wordTip.val(""); //清空已有文字
 		}
 		wordTip.hide();
+		console.log(Date() + ' 文字绘制');
 
 		//显示输入文本
 		$('.OCR-panel').find('input').val(word);
