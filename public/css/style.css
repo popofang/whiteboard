@@ -45,6 +45,12 @@ button span { width: 100%; }
 
 .others>.btn-group { float: right; }
 
+.others>span {
+    float: right;
+    font-size: 17px;
+    margin: 10px 20px 0 0;
+}
+
 #board {
     cursor: crosshair;
 }

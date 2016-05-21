@@ -3,7 +3,7 @@ extends head
 block content
 	.container
 		.row
-			.col-md-8.col-xs-8
+			.col-md-6.col-xs-6
 				.btn-group(role="group")
 					.btn-group.draw-options(role="group")
 						button.btn.btn-default.btn-lg.dropdown-toggle(type="button" aria-label="画笔" data-toggle="dropdown")
@@ -43,7 +43,7 @@ block content
 								input.stroke(type='text')
 					button.btn.btn-default.btn-lg.reset(type="button" aria-label="重置")
 						span.glyphicon.glyphicon-trash(aria-hidden="true")
-			.col-md-4.col-xs-4.others
+			.col-md-6.col-xs-6.others
 				.btn-group
 					button.btn.btn-default.btn-lg.history(type="button" aria-label="上一步")
 						span.glyphicon.glyphicon-arrow-left(aria-hidden="true")
@@ -53,6 +53,7 @@ block content
 						span.glyphicon.glyphicon-download-alt(aria-hidden="true")
 					button.btn.btn-default.btn-lg(type="button" aria-label="OCR")
 						span.glyphicon.glyphicon-search(aria-hidden="true")
+				span 在线用户:1
 		.row
 			.col-md-12#container
 				input#colorValue(type="hidden")

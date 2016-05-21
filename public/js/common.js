@@ -528,6 +528,8 @@ $(function() {
 		});
 		OCRCanvas.get(0).getContext("2d").putImageData(oImgOCR,0,0);
 		var sDataURL = OCRCanvas.get(0).toDataURL().substring(22);
+
+		console.log(Date() + ' 识别开始');
 		socket.emit('OCR', sDataURL); //发送文字识别请求
 		
 		OCRTip.hide();
@@ -540,6 +542,11 @@ $(function() {
 	//画板初始化
 	socket.on('init', function(data) {
 		fShowHistory(data);
+	});
+
+	//画板用户人数
+	socket.on('user', function(data) {
+		$('.others').children('span').html('在线用户:' + data);
 	});
 
 	//画板同步
@@ -578,6 +585,7 @@ $(function() {
 					$('.OCR-panel').find('input').val('无法识别');
 				}
 			}
+			console.log(Date() + ' 识别完成');
 		}
 	});
 
