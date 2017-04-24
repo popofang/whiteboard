@@ -126,7 +126,9 @@ $(function() {
 	var bNeedResetSize = false; //重置大小标识
 	var bNeedResetColor = true; //重置颜色标识
 	var nSeq = -1; //操作记录
-
+var drawingSurfaceData;
+var numDown=0;
+var nCX1,nCY1,nCX2,nCY2,nCX3,nCY3;
 	//鼠标拖动需要用的示意框
 	var shapeTip = $("<div class='tip'></div>");
 	var wordTip = $("<textarea class='tip'></textarea>"); 
@@ -142,10 +144,10 @@ $(function() {
 	$('#container').mousemove(fDraw); 
 
 	$("#container").mousedown(function(e){ //鼠标按下 
-        bIsPaint = true; //设置绘画标识
-        //设置画笔起始点
-        var offset = $("#board").offset();
-        nX = e.pageX - offset.left;
+        	bIsPaint = true; //设置绘画标识
+       		 //设置画笔起始点
+        	var offset = $("#board").offset();
+        	nX = e.pageX - offset.left;
 		nY = e.pageY - offset.top;
 
 		//初始化画笔范围
@@ -164,22 +166,22 @@ $(function() {
 		 		ctx.strokeStyle = $('.colors').css('color');
 		 		break;
 		 	}
-          	case "橡皮": {
-          		bNeedResetColor = true;
-          		ctx.strokeStyle = "#fff";
-          		break;
-          	}
-         	case "文字": {
-         		var sTipFontSize = ctx.font.split(' ')[0];
-         		wordTip.css({
+          		case "橡皮": {
+          			bNeedResetColor = true;
+          			ctx.strokeStyle = "#fff";
+          			break;
+          		}
+         		case "文字": {
+         			var sTipFontSize = ctx.font.split(' ')[0];
+         			wordTip.css({
          			color: ctx.strokeStyle,
          			'font-size': sTipFontSize
-         		});
-          		break;
-         	}
-          	case "图片":
-          		break;
-          	case "矩形": {
+         			});
+          			break;
+         		}
+          		case "图片":
+          			break;
+          		case "矩形": {
 			    var border = ctx.lineWidth + "px " + ctx.strokeStyle + " solid";
 			    shapeTip.css({
 				   "border": border,
@@ -196,11 +198,44 @@ $(function() {
 			   	fRotateTip(0);
 				break;    
 			}
+
+			case "三角形": {
+				var border = ctx.lineWidth + "px " + ctx.strokeStyle + " solid";
+			    shapeTip.css({
+				   "border": border,
+				"border-radius": 0
+			   	});
+			   	fRotateTip(0);
+				break;    
+			}
 			case "直线": {
 			    var border = ctx.lineWidth / 2 + "px " + ctx.strokeStyle + " solid";
 			    shapeTip.css({
 				   "border": border,
 			   	});
+				break;    
+			}
+			case "曲线": {
+				numDown+=1;
+			   	//画初始点
+
+				if(numDown==1){
+					nCX1=nX;
+					nCY1=nY;
+					ctx.beginPath();
+					ctx.arc(nX,nY,ctx.lineWidth/2,0,2*Math.PI);
+					ctx.stroke();
+				}
+				else if(numDown>=3){
+					numDown=1;
+					nCX1=nX;
+					nCY1=nY;
+					ctx.beginPath();
+					ctx.arc(nX,nY,ctx.lineWidth/2,0,2*Math.PI);
+					ctx.stroke();			}
+				else{
+					break;
+				}
 				break;    
 			}
 			case "OCR": {
@@ -226,11 +261,20 @@ $(function() {
 				break;
 			}
 			case "椭圆": {
+				
 				fDrawOvalTip(e);
+				break;    
+			}
+			case "三角形": {
+				fDrawSvalTip(e);
 				break;    
 			}
 			case "直线": {
 				fDrawLineTip(e);
+				break;
+			}
+			case "曲线": {
+				fDrawQineTip(e);
 				break;
 			}
 			case "OCR": {
@@ -241,38 +285,48 @@ $(function() {
 	}
 
   	$("#container").mouseup(function(e){ //鼠标放开
-        bIsPaint = false;
+        	bIsPaint = false;
 		switch(sType) {
 		 	case "画笔": {
 		 		fDoOCR(nMinX - ctx.lineWidth / 2, nMinY - ctx.lineWidth / 2, nMaxX - nMinX + ctx.lineWidth, nMaxY - nMinY + ctx.lineWidth);
 		 		console.log(Date() + ' 画笔绘制');
 		 		break;
 		 	}
-          	case "橡皮":
-          		console.log(Date() + ' 橡皮擦除');
-          		break;
-          	case "文字": {
-          	 	break;
-          	}
-          	case "矩形": {
-          		fDrawRect();
-          		console.log(Date() + ' 矩形绘制');
-          	 	break;
-          	}
-          	case "椭圆": {
-          		fDrawOval();
-          		console.log(Date() + ' 椭圆绘制');
-          	 	break;
-          	}
-          	case "直线":	{
-          		fDrawLine();
-          		console.log(Date() + ' 直线绘制');
-          	 	break;
-          	}
-          	case "OCR": {
-          		fDoOCR(nX, nY, nEndX - nX, nEndY - nY);
-          		break;
-          	}
+          		case "橡皮":
+          			console.log(Date() + ' 橡皮擦除');
+          			break;
+          		case "文字": {
+          	 		break;
+          		}
+		  	case "矩形": {
+		  		fDrawRect();
+		  		console.log(Date() + ' 矩形绘制');
+		  	 	break;
+		  	}
+		  	case "椭圆": {
+		  		fDrawOval();
+		  		console.log(Date() + ' 椭圆绘制');
+		  	 	break;
+		  	}
+		  	case "三角形": {
+		  		fDrawSval();
+		  		console.log(Date() + ' 三角形绘制');
+		  	 	break;
+		  	}
+		  	case "直线":	{
+		  		fDrawLine();
+		  		console.log(Date() + ' 直线绘制');
+		  	 	break;
+		  	}
+		  	case "曲线":	{
+		  		fDrawQine();
+		  		console.log(Date() + ' 曲线绘制');
+		  	 	break;
+		  	}
+		  	case "OCR": {
+		  		fDoOCR(nX, nY, nEndX - nX, nEndY - nY);
+		  		break;
+		  	}
 		}
 
 		//同步画板内容
@@ -287,19 +341,19 @@ $(function() {
   	//绘制任意线条
 	function fDrawFree(e) {
 		var offset = $("#board").offset();
-    	nEndX = e.pageX - offset.left;
-    	nEndY = e.pageY - offset.top;
+    		nEndX = e.pageX - offset.left;
+    		nEndY = e.pageY - offset.top;
 
     	//画笔范围
-    	nMinX = nMinX < nEndX ? nMinX : nEndX;
-    	nMinY = nMinY < nEndY ? nMinY : nEndY;
-    	nMaxX = nMaxX > nEndX ? nMaxX : nEndX;
-    	nMaxY = nMaxY > nEndY ? nMaxY : nEndY;
+    		nMinX = nMinX < nEndX ? nMinX : nEndX;
+    		nMinY = nMinY < nEndY ? nMinY : nEndY;
+    		nMaxX = nMaxX > nEndX ? nMaxX : nEndX;
+    		nMaxY = nMaxY > nEndY ? nMaxY : nEndY;
 
 		if(bIsPaint) {
 			ctx.lineTo(nEndX, nEndY);
 			ctx.stroke();  
-        } else {
+        	} else {
 			ctx.beginPath();
 		    ctx.moveTo(nEndX, nEndY);
 		}
@@ -376,6 +430,41 @@ $(function() {
 	 	$("#board").focus(); 
 	    shapeTip.hide();
   	}
+  	//绘制三角形
+  	function fDrawSvalTip(e) { //根据鼠标绘制椭圆示意框
+		var offset = $("#board").offset();
+        nEndX = e.pageX - offset.left;
+        nEndY = e.pageY - offset.top;
+
+	$("#board").get(0).onmousedown = function()
+	{	
+		 drawingSurfaceData = ctx.getImageData(0,0,$("#board").get(0).width,$("#board").get(0).height);
+	}
+	
+
+	if(bIsPaint) {
+		ctx.putImageData(drawingSurfaceData,0,0);
+	   	
+		ctx.beginPath();
+		ctx.moveTo(nX,nY);
+		ctx.lineTo(nEndX,nEndY);
+		ctx.lineTo(nX,nEndY);
+	   	ctx.closePath(); 
+	   	ctx.stroke();
+        }
+
+	
+        
+  	}
+	function fDrawSval() {
+	   	ctx.beginPath();
+		ctx.moveTo(nX,nY);
+		ctx.lineTo(nEndX,nEndY);
+		ctx.lineTo(nX,nEndY);
+	   	ctx.closePath(); 
+	   	ctx.stroke();
+	   	
+	};  	
 
   	//绘制椭圆
   	function fDrawOvalTip(e) { //根据鼠标绘制椭圆示意框
@@ -397,7 +486,6 @@ $(function() {
            	shapeTip.show();
         }
   	}
-
 	function fDrawOval() {
 		var nOvalX = (nEndX + nX) / 2; //椭圆中心横坐标
 		var nOvalY = (nEndY + nY) / 2; //椭圆中心纵坐标
@@ -418,20 +506,68 @@ $(function() {
 	   	ctx.stroke();
 	   	shapeTip.hide();
 	};
+	//绘制曲线
+	function fDrawQineTip(e) { //根据鼠标移动绘制直线示意线段
+		var offset = $("#board").offset();
+		nEndX = e.pageX - offset.left;
+		nEndY = e.pageY - offset.top;
+		if(bIsPaint) {
+
+		
+			if(numDown==2){
+				nCX2=nEndX;
+				nCY2=nEndY;
+
+		
+				ctx.putImageData(drawingSurfaceData,0,0);
+			
+				ctx.beginPath();
+				ctx.moveTo(nCX1,nCY1);
+				ctx.quadraticCurveTo(nCX2,nCY2,nCX3,nCY3);
+				ctx.stroke();
+				ctx.closePath(); 
+			}
+		}		
+
+				
+		
+		
+  	}
+
+  	function fDrawQine() { //鼠标放开时绘制直线
+		if(numDown==1){
+
+			nCX3=nEndX;
+			nCY3=nEndY;
+			ctx.beginPath();
+			ctx.arc(nEndX,nEndY,ctx.lineWidth/2,0,2*Math.PI);
+			ctx.stroke();
+			drawingSurfaceData = ctx.getImageData(0,0,$("#board").get(0).width,$("#board").get(0).height);
+		} 		
+		if(numDown==2){
+			ctx.beginPath();
+			ctx.moveTo(nCX1,nCY1);
+			ctx.quadraticCurveTo(nCX2,nCY2,nCX3,nCY3);
+			ctx.stroke();
+			ctx.closePath(); 
+		}
+	 	 
+	    
+  	}
 
   	//绘制直线
 	function fDrawLineTip(e) { //根据鼠标绘制直线示意线段
-  	    var offset = $("#board").offset();
-        nEndX = e.pageX - offset.left;
-        nEndY = e.pageY - offset.top;
-        if(bIsPaint) {
-        	//设置左上角
-        	shapeTip.css({
-        		left: nX + offset.left - ctx.lineWidth / 2, 
-        		top: nY - ctx.lineWidth / 2
-        	});
+		var offset = $("#board").offset();
+		nEndX = e.pageX - offset.left;
+		nEndY = e.pageY - offset.top;
+		if(bIsPaint) {
+			//设置左上角
+			shapeTip.css({
+				left: nX + offset.left - ctx.lineWidth / 2, 
+				top: nY - ctx.lineWidth / 2
+			});
 
-        	//改造shapeTip形状，使其成为直线
+			//改造shapeTip形状，使其成为直线
 			shapeTip.width(0);
 			var nLength = Math.sqrt(Math.pow(nEndX - nX, 2) + Math.pow(nEndY - nY, 2));
 			shapeTip.height(nLength - ctx.lineWidth);
@@ -441,7 +577,7 @@ $(function() {
 			//旋转shapeTip
 			fRotateTip(nDegree);
 			shapeTip.show();
-        }
+		}
   	}
 
   	function fDrawLine() { //鼠标放开时绘制直线
@@ -536,12 +672,13 @@ $(function() {
   	}
 
 
-	/******** 通讯 ********/
-	var socket = io.connect(window.location.origin);
-
+	/******** 通讯 *******/
+	//var socket = io.connect(window.location.origin);
+    var socket = io.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0]);
 	//画板初始化
 	socket.on('init', function(data) {
 		fShowHistory(data);
+
 	});
 
 	//画板用户人数

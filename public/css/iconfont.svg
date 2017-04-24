@@ -2,7 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <svg xmlns="http://www.w3.org/2000/svg">
 <metadata>
-Created by FontForge 20120731 at Thu Apr 28 21:09:29 2016
+Created by FontForge 20120731 at Sun Apr  9 20:09:47 2017
  By admin
 </metadata>
 <defs>
@@ -16,15 +16,17 @@ Created by FontForge 20120731 at Thu Apr 28 21:09:29 2016
     ascent="896"
     descent="-128"
     x-height="792"
-    bbox="0 -148 1280 896"
-    underline-thickness="50"
-    underline-position="-100"
-    unicode-range="U+0078-E603"
+    bbox="0 -128 1280 896"
+    underline-thickness="0"
+    underline-position="0"
+    unicode-range="U+0078-E690"
   />
-<missing-glyph horiz-adv-x="374" 
-d="M34 0v682h272v-682h-272zM68 34h204v614h-204v-614z" />
-    <glyph glyph-name=".notdef" horiz-adv-x="374" 
-d="M34 0v682h272v-682h-272zM68 34h204v614h-204v-614z" />
+<missing-glyph 
+ />
+    <glyph glyph-name=".notdef" 
+ />
+    <glyph glyph-name=".notdef" 
+ />
     <glyph glyph-name=".null" horiz-adv-x="0" 
  />
     <glyph glyph-name="nonmarkingreturn" horiz-adv-x="341" 
@@ -33,15 +35,20 @@ d="M34 0v682h272v-682h-272zM68 34h204v614h-204v-614z" />
 d="M281 543q-27 -1 -53 -1h-83q-18 0 -36.5 -6t-32.5 -18.5t-23 -32t-9 -45.5v-76h912v41q0 16 -0.5 30t-0.5 18q0 13 -5 29t-17 29.5t-31.5 22.5t-49.5 9h-133v-97h-438v97zM955 310v-52q0 -23 0.5 -52t0.5 -58t-10.5 -47.5t-26 -30t-33 -16t-31.5 -4.5q-14 -1 -29.5 -0.5
 t-29.5 0.5h-32l-45 128h-439l-44 -128h-29h-34q-20 0 -45 1q-25 0 -41 9.5t-25.5 23t-13.5 29.5t-4 30v167h911zM163 247q-12 0 -21 -8.5t-9 -21.5t9 -21.5t21 -8.5q13 0 22 8.5t9 21.5t-9 21.5t-22 8.5zM316 123q-8 -26 -14 -48q-5 -19 -10.5 -37t-7.5 -25t-3 -15t1 -14.5
 t9.5 -10.5t21.5 -4h37h67h81h80h64h36q23 0 34 12t2 38q-5 13 -9.5 30.5t-9.5 34.5q-5 19 -11 39h-368zM336 498v228q0 11 2.5 23t10 21.5t20.5 15.5t34 6h188q31 0 51.5 -14.5t20.5 -52.5v-227h-327z" />
-    <glyph glyph-name="uniE600" unicode="&#xe600;" 
-d="M26 382h970v-112h-970v112z" />
-    <glyph glyph-name="uniE601" unicode="&#xe601;" 
-d="M512 748q-91 0 -174 -35.5t-143 -95.5t-95.5 -143t-35.5 -174t35.5 -174t95.5 -143t143 -95.5t174 -35.5t174 35.5t143 95.5t95.5 143t35.5 174t-35.5 174t-95.5 143t-143 95.5t-174 35.5zM512 -44q-94 0 -173 46t-125 125t-46 173t46 173t125 125t173 46t173 -46
-t125 -125t46 -173t-46 -173t-125 -125t-173 -46z" />
-    <glyph glyph-name="uniE602" unicode="&#xe602;" 
-d="M684 679h-551h-69v-758h896v758h-276zM856 25h-688v551h688v-551z" />
-    <glyph glyph-name="uniE603" unicode="&#xe603;" horiz-adv-x="1280" 
+    <glyph glyph-name="cuxixiantiao" unicode="&#xe61d;" horiz-adv-x="1280" 
 d="M1237 811h-1194q-18 0 -30.5 12.5t-12.5 30t12.5 30t30.5 12.5h1194q18 0 30.5 -12.5t12.5 -30t-12.5 -30t-30.5 -12.5zM85 555h1110q35 0 60 -25t25 -60.5t-25 -60.5t-60 -25h-1110q-35 0 -60 25t-25 60.5t25 60.5t60 25zM85 128h1110q35 0 60 -25t25 -60v-86
 q0 -35 -25 -60t-60 -25h-1110q-35 0 -60 25t-25 60v86q0 35 25 60t60 25z" />
+    <glyph glyph-name="quxiangongju" unicode="&#xe686;" 
+d="M914 29l-1 24l1 -12l-9 8q4 6 6.5 26t2 127.5t-11.5 279.5q-13 205 -112 249q-22 10 -49.5 11t-52.5 -4.5t-51.5 -16t-46 -21t-38 -22.5t-25.5 -17t-9 -7l-393 -360l-16 18l393 360q6 5 16.5 12.5t35.5 23.5t53.5 28t61 22t67.5 9t64 -14q112 -50 126 -269
+q27 -418 -2 -450l-4 -4zM64 314l59 48l48 -59l-59 -48zM881 5l3 76l76 -4l-4 -75z" />
+    <glyph glyph-name="zhixian" unicode="&#xe690;" 
+d="M82 151l-7 14l864 451l8 -15zM948 590l-16 33l27 -6zM76 178l16 -33l-27 6z" />
+    <glyph glyph-name="tuoyuan" unicode="&#xe627;" 
+d="M512 845q93 0 178.5 -36.5t147.5 -98.5t98.5 -147.5t36.5 -178.5t-36.5 -178.5t-98.5 -147.5t-147.5 -98.5t-178.5 -36.5t-178.5 36.5t-147.5 98.5t-98.5 147.5t-36.5 178.5t36.5 178.5t98.5 147.5t147.5 98.5t178.5 36.5zM512 896q-138 0 -256 -69t-187 -187t-69 -256
+t69 -256t187 -187t256 -69t256 69t187 187t69 256t-69 256t-187 187t-256 69z" />
+    <glyph glyph-name="juxing" unicode="&#xe610;" 
+d="M256 640v-512h512v512h-512zM192 704h640v-640h-640v640z" />
+    <glyph glyph-name="sanjiaoxing" unicode="&#xe614;" 
+d="M475 705l18 31h38l18 -31l-37 -64zM175 64h674l-337 577zM512 768l448 -768h-896z" />
   </font>
 </defs></svg>
