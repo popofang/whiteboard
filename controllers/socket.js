@@ -1,5 +1,13 @@
+
+var SinaCloud = require('scs-sdk');
+SinaCloud.config.loadFromPath('./config.json');
+
+var myBucket = new SinaCloud.S3({params: {Bucket: 'whiteboard'}});
+
+//新浪云存储
 var fs = require('fs');
 var tesseract = require('node-tesseract');
+
 
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/whiteboard');
@@ -46,6 +54,20 @@ exports.socket = function(socket) {
   			seq: seq,
   			dataURL: data.dataURL,
   		});
+
+//云存储
+
+		myBucket.createBucket(function() {
+    			var data1 = {Key: seq.toString(), Body: data.dataURL.toString() };
+    			myBucket.putObject(data1, function(err, data1) {
+       				if (err) {
+            				console.log("Error uploading data: ", err);
+        			} else {
+            				console.log("Successfully uploaded data to myBucket/myKey");
+        			}
+    			});
+		});
+
 
   		history.save(function(err) {
   			if(err) {
